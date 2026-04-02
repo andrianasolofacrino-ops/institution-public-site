@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="page-form">
+
+    <div class="carte">
+
+        <div class="carte-entete">
+            <h2>Connexion</h2>
+            <p>Entrez vos identifiants pour accéder à votre espace</p>
+        </div>
+
+        <form onsubmit="loginUser(event)">
+
+            <label for="email">Adresse email</label>
+            <input type="email" id="email" placeholder="exemple@email.com" required>
+
+            <label for="password">Mot de passe</label>
+            <input type="password" id="password" placeholder="Votre mot de passe" required>
+
+            <button type="submit" class="btn-submit">Se connecter</button>
+
+        </form>
+
+        <div id="msgLogin" class="msg-retour"></div>
+
+        <div class="lien-bas">
+            Pas encore de compte ? <a href="register.html">Créer un compte</a>
+        </div>
+        <div class="lien-bas">
+            <a href="index.html">← Retour à l'accueil</a>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
