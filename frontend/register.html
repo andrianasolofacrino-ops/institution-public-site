@@ -3,44 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inscription</title>
+    <title>Inscription — CommuneService</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Marianne:wght@400;500;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="page-form">
+<body class="page-auth">
 
-    <div class="carte">
+    <div class="auth-container">
 
-        <div class="carte-entete">
-            <h2>Créer un compte</h2>
-            <p>Remplissez le formulaire pour vous inscrire</p>
+        <div class="auth-side auth-side-green d-none d-lg-flex">
+            <div class="auth-side-content">
+                <a href="index.html" class="auth-logo">
+                    <i class="bi bi-building-fill"></i>
+                    <div>
+                        <div class="auth-logo-name">CommuneService</div>
+                        <div class="auth-logo-sub">Portail Administratif</div>
+                    </div>
+                </a>
+                <h2 class="auth-side-title">Rejoignez le portail<br>administratif<br>numérique.</h2>
+                <p class="auth-side-desc">Créez votre compte en moins d'une minute et accédez à tous nos services administratifs en ligne.</p>
+                <div class="auth-side-features">
+                    <div class="auth-feature">
+                        <i class="bi bi-person-check-fill"></i>
+                        <span>Inscription rapide et gratuite</span>
+                    </div>
+                    <div class="auth-feature">
+                        <i class="bi bi-file-earmark-text-fill"></i>
+                        <span>6 types de demandes disponibles</span>
+                    </div>
+                    <div class="auth-feature">
+                        <i class="bi bi-graph-up-arrow"></i>
+                        <span>Suivi en temps réel</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <form onsubmit="registerUser(event)">
+        <div class="auth-form-side">
+            <div class="auth-form-wrap">
 
-            <label for="nom">Nom complet</label>
-            <input type="text" id="nom" placeholder="Votre nom complet" required>
+                <a href="index.html" class="auth-back">
+                    <i class="bi bi-arrow-left me-1"></i>Retour à l'accueil
+                </a>
 
-            <label for="email">Adresse email</label>
-            <input type="email" id="email" placeholder="exemple@email.com" required>
+                <div class="auth-header">
+                    <div class="auth-icon auth-icon-green"><i class="bi bi-person-plus-fill"></i></div>
+                    <h1 class="auth-title">Créer un compte</h1>
+                    <p class="auth-subtitle">Rejoignez le portail administratif</p>
+                </div>
 
-            <label for="password">Mot de passe</label>
-            <input type="password" id="password" placeholder="Choisissez un mot de passe" required minlength="4">
+                <div id="msgRegister" class="alert d-none" role="alert"></div>
 
-            <button type="submit" class="btn-submit-vert">Créer mon compte</button>
+                <form onsubmit="registerUser(event)" novalidate>
 
-        </form>
+                    <div class="form-group-gov mb-3">
+                        <label for="nom" class="form-label-gov">
+                            <i class="bi bi-person-fill me-1"></i>Nom complet
+                        </label>
+                        <input
+                            type="text"
+                            class="form-control form-control-gov"
+                            id="nom"
+                            placeholder="Votre nom complet"
+                            required>
+                    </div>
 
-        <div id="msgRegister" class="msg-retour"></div>
+                    <div class="form-group-gov mb-3">
+                        <label for="email" class="form-label-gov">
+                            <i class="bi bi-envelope-fill me-1"></i>Adresse email
+                        </label>
+                        <input
+                            type="email"
+                            class="form-control form-control-gov"
+                            id="email"
+                            placeholder="exemple@gmail.com"
+                            required>
+                    </div>
 
-        <div class="lien-bas">
-            Déjà un compte ? <a href="login.html">Se connecter</a>
-        </div>
-        <div class="lien-bas">
-            <a href="index.html">← Retour à l'accueil</a>
+                    <div class="form-group-gov mb-4">
+                        <label for="password" class="form-label-gov">
+                            <i class="bi bi-key-fill me-1"></i>Mot de passe
+                        </label>
+                        <div class="input-password-wrap">
+                            <input
+                                type="password"
+                                class="form-control form-control-gov"
+                                id="password"
+                                placeholder="Minimum 4 caractères"
+                                required
+                                minlength="4">
+                            <button type="button" class="btn-toggle-pwd" onclick="togglePassword('password', this)" aria-label="Afficher le mot de passe" title="Afficher/Masquer">
+                                <i class="bi bi-eye-fill" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div class="form-hint">Minimum 4 caractères</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-gov-green w-100 btn-lg">
+                        <i class="bi bi-person-check-fill me-2"></i>Créer mon compte
+                    </button>
+
+                </form>
+
+                <div class="auth-divider"><span>ou</span></div>
+
+                <div class="auth-links">
+                    <p>Déjà un compte ?
+                        <a href="login.html" class="auth-link">Se connecter</a>
+                    </p>
+                </div>
+
+            </div>
         </div>
 
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

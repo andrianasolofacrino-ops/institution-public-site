@@ -3,128 +3,253 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tableau de bord</title>
+    <title>Tableau de bord — CommuneService</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Marianne:wght@400;500;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="page-app">
 
-    <!-- NAVBAR -->
-    <nav class="navbar">
-        <h1>Gestion des demandes</h1>
-        <span>Bonjour, <strong id="nomUtilisateur">...</strong></span>
-        <div style="display:flex; gap:8px;">
-            <a href="profil.html" class="btn-profil">Mon profil</a>
-            <button class="btn-logout" onclick="logout()">Se déconnecter</button>
+    <!-- TOPBAR -->
+    <header class="topbar">
+        <div class="topbar-brand">
+            <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" aria-label="Ouvrir le menu" title="Menu">
+                <i class="bi bi-list" aria-hidden="true"></i>
+            </button>
+            <a href="index.html" class="topbar-logo">
+                <i class="bi bi-building-fill me-2"></i>
+                <span>CommuneService</span>
+            </a>
         </div>
-    </nav>
-
-    <div class="container">
-
-        <!-- MESSAGE RETOUR -->
-        <div id="msgDashboard" class="msg-retour"></div>
-
-        <!-- STATISTIQUES -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-number" id="statTotal">0</div>
-                <div class="stat-label">Total demandes</div>
-            </div>
-            <div class="stat-card stat-attente">
-                <div class="stat-number" id="statAttente">0</div>
-                <div class="stat-label">En attente</div>
-            </div>
-            <div class="stat-card stat-encours">
-                <div class="stat-number" id="statEncours">0</div>
-                <div class="stat-label">En cours</div>
-            </div>
-            <div class="stat-card stat-termine">
-                <div class="stat-number" id="statTermine">0</div>
-                <div class="stat-label">Terminées</div>
+        <div class="topbar-actions">
+            <a href="demande.html" class="btn btn-gov btn-sm d-none d-sm-inline-flex">
+                <i class="bi bi-plus-circle-fill me-1"></i>Nouvelle demande
+            </a>
+            <div class="topbar-user" onclick="toggleUserMenu()">
+                <div class="user-avatar" id="topbarAvatar">?</div>
+                <span class="user-name d-none d-md-inline" id="topbarNom">...</span>
+                <i class="bi bi-chevron-down ms-1 chevron-user" aria-hidden="true"></i>
+                <div class="user-menu" id="userMenu">
+                    <a href="profil.html" class="user-menu-item">
+                        <i class="bi bi-person-circle"></i>Mon profil
+                    </a>
+                    <div class="user-menu-divider"></div>
+                    <button onclick="logout()" class="user-menu-item user-menu-logout" aria-label="Se déconnecter" title="Se déconnecter">
+                        <i class="bi bi-box-arrow-right"></i>Se déconnecter
+                    </button>
+                </div>
             </div>
         </div>
+    </header>
 
-        <!-- BARRE ACTION + FILTRES -->
-        <div class="barre-action">
-            <h2>Mes demandes</h2>
-            <a href="demande.html" class="btn-nouvelle">+ Nouvelle demande</a>
-        </div>
+    <div class="app-layout">
 
-        <!-- FILTRES ET RECHERCHE -->
-        <div class="filtres-bar">
-            <input
-                type="text"
-                id="searchInput"
-                placeholder="Rechercher une demande..."
-                oninput="filtrerDemandes()"
-                class="search-input"
-            >
-            <select id="filtreStatut" onchange="filtrerDemandes()" class="filtre-select">
-                <option value="">Tous les statuts</option>
-                <option value="En attente">En attente</option>
-                <option value="En cours">En cours</option>
-                <option value="Terminée">Terminée</option>
-                <option value="Refusée">Refusée</option>
-            </select>
-            <select id="filtreType" onchange="filtrerDemandes()" class="filtre-select">
-                <option value="">Tous les types</option>
-                <option value="Certificat de résidence">Certificat de résidence</option>
-                <option value="Acte de naissance">Acte de naissance</option>
-                <option value="Acte de mariage">Acte de mariage</option>
-                <option value="Certificat de vie">Certificat de vie</option>
-                <option value="Légalisation de document">Légalisation de document</option>
-                <option value="Autre demande">Autre demande</option>
-            </select>
-            <button class="btn-reset" onclick="resetFiltres()">Réinitialiser</button>
-        </div>
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <nav class="sidebar-nav">
+                <div class="sidebar-section-label">Principal</div>
+                <a href="dashboard.html" class="sidebar-link active">
+                    <i class="bi bi-grid-fill"></i>
+                    <span>Tableau de bord</span>
+                </a>
+                <a href="demande.html" class="sidebar-link">
+                    <i class="bi bi-file-earmark-plus-fill"></i>
+                    <span>Nouvelle demande</span>
+                </a>
+                <div class="sidebar-section-label mt-3">Mon compte</div>
+                <a href="profil.html" class="sidebar-link">
+                    <i class="bi bi-person-circle"></i>
+                    <span>Mon profil</span>
+                </a>
+                <button onclick="logout()" class="sidebar-link sidebar-logout" aria-label="Se déconnecter" title="Se déconnecter">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Se déconnecter</span>
+                </button>
+            </nav>
+        </aside>
 
-        <!-- LISTE DES DEMANDES -->
-        <div id="listeDemandes">
-            <p class="chargement-msg">Chargement...</p>
-        </div>
+        <!-- CONTENU PRINCIPAL -->
+        <main class="app-main">
 
-        <!-- PAGINATION -->
-        <div class="pagination" id="pagination"></div>
+            <!-- HEADER PAGE -->
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">
+                        Bonjour, <span id="nomUtilisateur">...</span> 👋
+                    </h1>
+                    <p class="page-subtitle">Gérez et suivez vos demandes administratives</p>
+                </div>
+                <a href="demande.html" class="btn btn-gov">
+                    <i class="bi bi-plus-circle-fill me-2"></i>
+                    Nouvelle demande
+                </a>
+            </div>
 
+            <!-- MESSAGE RETOUR -->
+            <div id="msgDashboard" class="alert d-none mb-4" role="alert"></div>
+
+            <!-- CARTES STATISTIQUES -->
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card-pro">
+                        <div class="stat-card-icon stat-icon-blue">
+                            <i class="bi bi-folder2-open"></i>
+                        </div>
+                        <div class="stat-card-body">
+                            <div class="stat-card-num" id="statTotal">0</div>
+                            <div class="stat-card-lbl">Total demandes</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card-pro">
+                        <div class="stat-card-icon stat-icon-yellow">
+                            <i class="bi bi-hourglass-split"></i>
+                        </div>
+                        <div class="stat-card-body">
+                            <div class="stat-card-num text-warning" id="statAttente">0</div>
+                            <div class="stat-card-lbl">En attente</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card-pro">
+                        <div class="stat-card-icon stat-icon-blue2">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </div>
+                        <div class="stat-card-body">
+                            <div class="stat-card-num text-primary" id="statEncours">0</div>
+                            <div class="stat-card-lbl">En cours</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card-pro">
+                        <div class="stat-card-icon stat-icon-green">
+                            <i class="bi bi-check-circle-fill"></i>
+                        </div>
+                        <div class="stat-card-body">
+                            <div class="stat-card-num text-success" id="statTermine">0</div>
+                            <div class="stat-card-lbl">Terminées</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FILTRES -->
+            <div class="filters-bar mb-3">
+                <div class="filters-bar-left">
+                    <h2 class="section-heading">Mes demandes</h2>
+                </div>
+                <div class="filters-bar-right">
+                    <div class="search-wrap">
+                        <i class="bi bi-search search-icon"></i>
+                        <input
+                            type="text"
+                            id="searchInput"
+                            class="form-control search-input-pro"
+                            placeholder="Rechercher..."
+                            oninput="filtrerDemandes()">
+                    </div>
+                    <select id="filtreStatut" class="form-select select-filter" onchange="filtrerDemandes()" title="Filtrer par statut" aria-label="Filtrer par statut">
+                        <option value="">Tous les statuts</option>
+                        <option value="En attente">En attente</option>
+                        <option value="En cours">En cours</option>
+                        <option value="Terminée">Terminée</option>
+                        <option value="Refusée">Refusée</option>
+                    </select>
+                    <select id="filtreType" class="form-select select-filter" onchange="filtrerDemandes()" title="Filtrer par type" aria-label="Filtrer par type">
+                        <option value="">Tous les types</option>
+                        <option value="Certificat de résidence">Certificat de résidence</option>
+                        <option value="Acte de naissance">Acte de naissance</option>
+                        <option value="Acte de mariage">Acte de mariage</option>
+                        <option value="Certificat de vie">Certificat de vie</option>
+                        <option value="Légalisation de document">Légalisation</option>
+                        <option value="Autre demande">Autre</option>
+                    </select>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="resetFiltres()" title="Réinitialiser">
+                        <i class="bi bi-x-circle"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- LISTE DEMANDES -->
+            <div id="listeDemandes">
+                <div class="loading-state">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-3 text-muted">Chargement de vos demandes...</p>
+                </div>
+            </div>
+
+            <!-- PAGINATION -->
+            <nav id="pagination" class="pagination-wrap"></nav>
+
+        </main>
     </div>
 
     <!-- MODALE MODIFICATION -->
-    <div id="modaleModif" class="modale">
-        <div class="modale-contenu">
-            <h3>Modifier la demande</h3>
-            <input type="hidden" id="modifId">
-
-            <label for="modifTitre">Type de demande</label>
-            <select id="modifTitre">
-                <option value="Certificat de résidence">Certificat de résidence</option>
-                <option value="Acte de naissance">Acte de naissance</option>
-                <option value="Acte de mariage">Acte de mariage</option>
-                <option value="Certificat de vie">Certificat de vie</option>
-                <option value="Légalisation de document">Légalisation de document</option>
-                <option value="Autre demande">Autre demande</option>
-            </select>
-
-            <label for="modifDescription">Description</label>
-            <textarea id="modifDescription" placeholder="Description de la demande"></textarea>
-
-            <div class="modale-actions">
-                <button class="btn-annuler" onclick="fermerModification()">Annuler</button>
-                <button class="btn-sauvegarder" onclick="sauvegarderModification(event)">Sauvegarder</button>
+    <div class="modal fade" id="modaleModif" tabindex="-1" aria-labelledby="modaleModifLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-gov">
+                <div class="modal-header modal-header-gov">
+                    <h5 class="modal-title" id="modaleModifLabel">
+                        <i class="bi bi-pencil-fill me-2"></i>Modifier la demande
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <input type="hidden" id="modifId">
+                    <div class="mb-3">
+                        <label for="modifTitre" class="form-label-gov">Type de demande</label>
+                        <select id="modifTitre" class="form-select form-control-gov" title="Type de demande" aria-label="Type de demande">
+                            <option value="Certificat de résidence">Certificat de résidence</option>
+                            <option value="Acte de naissance">Acte de naissance</option>
+                            <option value="Acte de mariage">Acte de mariage</option>
+                            <option value="Certificat de vie">Certificat de vie</option>
+                            <option value="Légalisation de document">Légalisation de document</option>
+                            <option value="Autre demande">Autre demande</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="modifDescription" class="form-label-gov">Description</label>
+                        <textarea id="modifDescription" class="form-control form-control-gov" rows="4" placeholder="Description de la demande"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer modal-footer-gov">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="fermerModification()">Annuler</button>
+                    <button type="button" class="btn btn-gov" onclick="sauvegarderModification(event)">
+                        <i class="bi bi-check-lg me-1"></i>Sauvegarder
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- MODALE DÉTAIL -->
-    <div id="modaleDetail" class="modale">
-        <div class="modale-contenu">
-            <h3>Détail de la demande</h3>
-            <div id="detailContenu"></div>
-            <div class="modale-actions">
-                <button class="btn-annuler" onclick="fermerDetail()">Fermer</button>
-                <button class="btn-imprimer" onclick="imprimerDemande()">Imprimer</button>
+    <div class="modal fade" id="modaleDetail" tabindex="-1" aria-labelledby="modaleDetailLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-gov">
+                <div class="modal-header modal-header-gov">
+                    <h5 class="modal-title" id="modaleDetailLabel">
+                        <i class="bi bi-file-text-fill me-2"></i>Détail de la demande
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div id="detailContenu"></div>
+                </div>
+                <div class="modal-footer modal-footer-gov">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="fermerDetail()">Fermer</button>
+                    <button type="button" class="btn btn-teal" onclick="imprimerDemande()">
+                        <i class="bi bi-printer-fill me-1"></i>Imprimer
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

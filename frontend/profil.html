@@ -1,243 +1,213 @@
-/* ═══════════════════════════════════════════
-   STYLE.CSS — Institution Publique
-   ═══════════════════════════════════════════ */
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon profil — CommuneService</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Marianne:wght@400;500;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="page-app">
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+    <header class="topbar">
+        <div class="topbar-brand">
+            <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Ouvrir le menu" title="Menu">
+                <i class="bi bi-list" aria-hidden="true"></i>
+            </button>
+            <a href="index.html" class="topbar-logo">
+                <i class="bi bi-building-fill me-2" aria-hidden="true"></i>
+                <span>CommuneService</span>
+            </a>
+        </div>
+        <div class="topbar-actions">
+            <div class="topbar-user" onclick="toggleUserMenu()">
+                <div class="user-avatar" id="topbarAvatar" aria-hidden="true">?</div>
+                <span class="user-name d-none d-md-inline" id="nomUtilisateur">...</span>
+                <i class="bi bi-chevron-down ms-1 chevron-user" aria-hidden="true"></i>
+                <div class="user-menu" id="userMenu">
+                    <a href="profil.html" class="user-menu-item">
+                        <i class="bi bi-person-circle" aria-hidden="true"></i>Mon profil
+                    </a>
+                    <div class="user-menu-divider"></div>
+                    <button onclick="logout()" class="user-menu-item user-menu-logout" aria-label="Se déconnecter" title="Se déconnecter">
+                        <i class="bi bi-box-arrow-right" aria-hidden="true"></i>Se déconnecter
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
 
-body {
-    font-family: Arial, sans-serif;
-    background: #f0f2f5;
-    color: #333;
-}
+    <div class="app-layout">
+        <aside class="sidebar" id="sidebar">
+            <nav class="sidebar-nav" aria-label="Navigation principale">
+                <div class="sidebar-section-label">Principal</div>
+                <a href="dashboard.html" class="sidebar-link">
+                    <i class="bi bi-grid-fill" aria-hidden="true"></i><span>Tableau de bord</span>
+                </a>
+                <a href="demande.html" class="sidebar-link">
+                    <i class="bi bi-file-earmark-plus-fill" aria-hidden="true"></i><span>Nouvelle demande</span>
+                </a>
+                <div class="sidebar-section-label mt-3">Mon compte</div>
+                <a href="profil.html" class="sidebar-link active">
+                    <i class="bi bi-person-circle" aria-hidden="true"></i><span>Mon profil</span>
+                </a>
+                <button onclick="logout()" class="sidebar-link sidebar-logout" aria-label="Se déconnecter" title="Se déconnecter">
+                    <i class="bi bi-box-arrow-right" aria-hidden="true"></i><span>Se déconnecter</span>
+                </button>
+            </nav>
+        </aside>
 
-/* PAGE ACCUEIL */
-.page-accueil {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #2c3e50, #3498db);
-}
-.boutons-accueil { display: flex; flex-direction: column; gap: 12px; margin-top: 28px; }
-.btn-connexion { display: block; background: #2c3e50; color: white; padding: 13px; border-radius: 7px; text-decoration: none; font-size: 15px; font-weight: bold; text-align: center; }
-.btn-connexion:hover { background: #1a252f; }
-.btn-inscription { display: block; background: white; color: #2c3e50; padding: 13px; border-radius: 7px; text-decoration: none; font-size: 15px; font-weight: bold; border: 2px solid #2c3e50; text-align: center; }
-.btn-inscription:hover { background: #2c3e50; color: white; }
+        <main class="app-main">
 
-/* CARTE COMMUNE */
-.carte { background: white; border-radius: 10px; padding: 40px 36px; max-width: 420px; width: 90%; box-shadow: 0 2px 16px rgba(0,0,0,0.10); }
-.carte-large { max-width: 560px; }
-.page-form { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-.carte-entete { text-align: center; margin-bottom: 28px; }
-.carte-entete h2 { font-size: 22px; color: #2c3e50; margin-bottom: 6px; }
-.carte-entete p { color: #888; font-size: 14px; }
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Mon profil</h1>
+                    <p class="page-subtitle">Gérez vos informations personnelles</p>
+                </div>
+                <a href="dashboard.html" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Retour
+                </a>
+            </div>
 
-/* FORMULAIRES */
-label { display: block; font-size: 13px; font-weight: bold; color: #444; margin-bottom: 5px; margin-top: 16px; }
-input[type="text"], input[type="email"], input[type="password"], select, textarea {
-    width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px;
-    font-size: 14px; font-family: Arial, sans-serif; outline: none; background: white;
-}
-input:focus, select:focus, textarea:focus { border-color: #3498db; }
-textarea { height: 120px; resize: vertical; }
+            <div class="row g-4">
 
-/* BOUTONS */
-.btn-submit { width: 100%; padding: 12px; background: #2c3e50; color: white; border: none; border-radius: 7px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 22px; }
-.btn-submit:hover { background: #1a252f; }
-.btn-submit-vert { width: 100%; padding: 12px; background: #27ae60; color: white; border: none; border-radius: 7px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 22px; }
-.btn-submit-vert:hover { background: #219a52; }
+                <!-- COLONNE GAUCHE — avatar + infos -->
+                <div class="col-lg-4">
+                    <div class="profil-card">
+                        <div class="profil-card-header">
+                            <div class="profil-avatar" id="avatarInitiales" aria-hidden="true">?</div>
+                            <div class="profil-nom" id="profilNom">Chargement...</div>
+                            <div class="profil-email-text" id="profilEmail"></div>
+                        </div>
+                        <div class="p-3">
+                            <div class="profil-status-box">
+                                <i class="bi bi-shield-check-fill text-success" aria-hidden="true"></i>
+                                <div>
+                                    <div class="profil-status-title">Compte actif</div>
+                                    <div class="profil-status-sub">Citoyen inscrit</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-/* MESSAGES */
-.msg-retour { display: none; padding: 10px 14px; border-radius: 6px; font-size: 13px; margin-top: 14px; }
-.msg-succes { background: #d1e7dd; color: #0a3622; }
-.msg-erreur { background: #f8d7da; color: #842029; }
+                <!-- COLONNE DROITE — formulaires -->
+                <div class="col-lg-8">
 
-/* LIENS BAS */
-.lien-bas { text-align: center; margin-top: 16px; font-size: 13px; color: #888; }
-.lien-bas a { color: #3498db; text-decoration: none; font-weight: bold; }
-.lien-bas a:hover { text-decoration: underline; }
+                    <div id="msgProfil" class="alert d-none mb-3" role="alert"></div>
 
-/* NAVBAR */
-.navbar { background: #2c3e50; color: white; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; }
-.navbar h1 { font-size: 17px; }
-.navbar span { font-size: 14px; opacity: 0.85; }
-.navbar a { color: #aed6f1; text-decoration: none; font-size: 14px; }
-.navbar a:hover { color: white; }
-.btn-logout { background: #e74c3c; color: white; border: none; padding: 7px 16px; border-radius: 5px; cursor: pointer; font-size: 14px; }
-.btn-logout:hover { background: #c0392b; }
+                    <!-- Modifier nom -->
+                    <div class="profil-section-card mb-4">
+                        <div class="profil-section-header">
+                            <i class="bi bi-person-fill" aria-hidden="true"></i>
+                            Modifier le nom
+                        </div>
+                        <div class="profil-section-body">
+                            <form onsubmit="modifierNom(event)" novalidate>
+                                <label for="nouveauNom" class="form-label-gov">Nouveau nom complet</label>
+                                <input
+                                    type="text"
+                                    id="nouveauNom"
+                                    class="form-control form-control-gov"
+                                    placeholder="Votre nom complet"
+                                    required>
+                                <div class="mt-3">
+                                    <button type="submit" class="btn btn-gov">
+                                        <i class="bi bi-check-lg me-1" aria-hidden="true"></i>
+                                        Sauvegarder le nom
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
 
-/* DASHBOARD */
-.container { max-width: 860px; margin: 30px auto; padding: 0 16px; }
-.barre-action { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.barre-action h2 { font-size: 20px; color: #2c3e50; }
-.btn-nouvelle { background: #27ae60; color: white; padding: 9px 18px; border: none; border-radius: 6px; text-decoration: none; font-size: 14px; }
-.btn-nouvelle:hover { background: #219a52; }
+                    <!-- Changer mot de passe -->
+                    <div class="profil-section-card">
+                        <div class="profil-section-header">
+                            <i class="bi bi-key-fill" aria-hidden="true"></i>
+                            Changer le mot de passe
+                        </div>
+                        <div class="profil-section-body">
+                            <form onsubmit="changerMotDePasse(event)" novalidate>
 
-/* CARDS */
-.card { background: white; border-radius: 8px; padding: 16px; margin-bottom: 14px; border-left: 4px solid #3498db; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-.card-header h3 { font-size: 16px; color: #2c3e50; }
-.card-desc { color: #555; font-size: 14px; margin-bottom: 8px; }
-.card-date { color: #999; font-size: 12px; }
-.card-actions { margin-top: 12px; display: flex; gap: 8px; }
+                                <div class="mb-3">
+                                    <label for="ancienMdp" class="form-label-gov">Mot de passe actuel</label>
+                                    <div class="input-password-wrap">
+                                        <input
+                                            type="password"
+                                            id="ancienMdp"
+                                            class="form-control form-control-gov"
+                                            placeholder="Mot de passe actuel"
+                                            required>
+                                        <button
+                                            type="button"
+                                            class="btn-toggle-pwd"
+                                            onclick="togglePassword('ancienMdp', this)"
+                                            aria-label="Afficher le mot de passe actuel"
+                                            title="Afficher/Masquer">
+                                            <i class="bi bi-eye-fill" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                </div>
 
-/* BADGES */
-.badge { font-size: 12px; padding: 3px 10px; border-radius: 12px; font-weight: bold; }
-.badge-attente { background: #fff3cd; color: #856404; }
-.badge-encours { background: #cfe2ff; color: #084298; }
-.badge-termine { background: #d1e7dd; color: #0a3622; }
-.badge-refuse  { background: #f8d7da; color: #842029; }
+                                <div class="mb-3">
+                                    <label for="nouveauMdp" class="form-label-gov">Nouveau mot de passe</label>
+                                    <div class="input-password-wrap">
+                                        <input
+                                            type="password"
+                                            id="nouveauMdp"
+                                            class="form-control form-control-gov"
+                                            placeholder="Nouveau mot de passe (min. 4 caractères)"
+                                            required
+                                            minlength="4">
+                                        <button
+                                            type="button"
+                                            class="btn-toggle-pwd"
+                                            onclick="togglePassword('nouveauMdp', this)"
+                                            aria-label="Afficher le nouveau mot de passe"
+                                            title="Afficher/Masquer">
+                                            <i class="bi bi-eye-fill" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                </div>
 
-/* BOUTONS ACTIONS */
-.btn-modifier { background: #3498db; color: white; border: none; padding: 6px 14px; border-radius: 5px; cursor: pointer; font-size: 13px; }
-.btn-modifier:hover { background: #2980b9; }
-.btn-supprimer { background: #e74c3c; color: white; border: none; padding: 6px 14px; border-radius: 5px; cursor: pointer; font-size: 13px; }
-.btn-supprimer:hover { background: #c0392b; }
+                                <div class="mb-4">
+                                    <label for="confirmMdp" class="form-label-gov">Confirmer le nouveau mot de passe</label>
+                                    <div class="input-password-wrap">
+                                        <input
+                                            type="password"
+                                            id="confirmMdp"
+                                            class="form-control form-control-gov"
+                                            placeholder="Confirmer le mot de passe"
+                                            required>
+                                        <button
+                                            type="button"
+                                            class="btn-toggle-pwd"
+                                            onclick="togglePassword('confirmMdp', this)"
+                                            aria-label="Afficher la confirmation"
+                                            title="Afficher/Masquer">
+                                            <i class="bi bi-eye-fill" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                </div>
 
-/* VIDE */
-.vide { text-align: center; padding: 40px; color: #888; background: white; border-radius: 8px; }
-.vide a { display: inline-block; margin-top: 12px; background: #27ae60; color: white; padding: 8px 18px; border-radius: 6px; text-decoration: none; }
-.erreur-msg { color: #842029; background: #f8d7da; padding: 12px; border-radius: 6px; }
+                                <button type="submit" class="btn btn-gov-green">
+                                    <i class="bi bi-shield-lock-fill me-1" aria-hidden="true"></i>
+                                    Changer le mot de passe
+                                </button>
 
-/* MODALE */
-.modale { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 999; }
-.modale-contenu { background: white; padding: 28px; border-radius: 10px; width: 90%; max-width: 500px; }
-.modale-contenu h3 { margin-bottom: 16px; color: #2c3e50; font-size: 18px; }
-.modale-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
-.btn-annuler { background: #95a5a6; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
-.btn-annuler:hover { background: #7f8c8d; }
-.btn-sauvegarder { background: #27ae60; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
-.btn-sauvegarder:hover { background: #219a52; }
+                            </form>
+                        </div>
+                    </div>
 
-/* RESPONSIVE */
-@media (max-width: 600px) {
-    .navbar { flex-direction: column; gap: 10px; text-align: center; }
-    .barre-action { flex-direction: column; gap: 12px; }
-    .carte { padding: 28px 20px; }
-    .card-actions { flex-direction: column; }
-}
+                </div>
+            </div>
+        </main>
+    </div>
 
-/* ═══════════════════════════════════════════
-   STATISTIQUES
-   ═══════════════════════════════════════════ */
-.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; }
-.stat-card { background: white; border-radius: var(--border-radius-lg, 12px); padding: 18px 16px; text-align: center; border: 0.5px solid #ddd; }
-.stat-number { font-size: 32px; font-weight: bold; color: #2c3e50; }
-.stat-label { font-size: 12px; color: #888; margin-top: 4px; }
-.stat-attente .stat-number { color: #856404; }
-.stat-encours .stat-number { color: #084298; }
-.stat-termine .stat-number { color: #0a3622; }
-
-/* ═══════════════════════════════════════════
-   FILTRES ET RECHERCHE
-   ═══════════════════════════════════════════ */
-.filtres-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; }
-.search-input { flex: 1; min-width: 180px; padding: 9px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; outline: none; }
-.search-input:focus { border-color: #3498db; }
-.filtre-select { padding: 9px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background: white; cursor: pointer; }
-.btn-reset { padding: 9px 14px; background: #95a5a6; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; }
-.btn-reset:hover { background: #7f8c8d; }
-
-/* ═══════════════════════════════════════════
-   BOUTONS SUPPLÉMENTAIRES
-   ═══════════════════════════════════════════ */
-.btn-voir { background: #8e44ad; color: white; border: none; padding: 6px 14px; border-radius: 5px; cursor: pointer; font-size: 13px; }
-.btn-voir:hover { background: #7d3c98; }
-.btn-imprimer-inline { background: #16a085; color: white; border: none; padding: 6px 14px; border-radius: 5px; cursor: pointer; font-size: 13px; }
-.btn-imprimer-inline:hover { background: #138d75; }
-.btn-imprimer { background: #16a085; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
-.btn-profil { background: rgba(255,255,255,0.15); color: white; padding: 7px 14px; border-radius: 5px; text-decoration: none; font-size: 13px; border: 1px solid rgba(255,255,255,0.3); }
-.btn-profil:hover { background: rgba(255,255,255,0.25); color: white; }
-.btn-sm { padding: 4px 10px; font-size: 12px; }
-
-/* ═══════════════════════════════════════════
-   PAGINATION
-   ═══════════════════════════════════════════ */
-.pagination { display: flex; gap: 6px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
-.btn-page { padding: 7px 13px; border: 1px solid #ddd; background: white; border-radius: 5px; cursor: pointer; font-size: 13px; color: #333; }
-.btn-page:hover { background: #f0f2f5; }
-.btn-page.active { background: #2c3e50; color: white; border-color: #2c3e50; }
-.btn-page.disabled { opacity: 0.4; cursor: not-allowed; }
-
-/* ═══════════════════════════════════════════
-   TABLE ADMIN
-   ═══════════════════════════════════════════ */
-.table-wrapper { overflow-x: auto; }
-.admin-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-.admin-table th { background: #2c3e50; color: white; padding: 12px 14px; text-align: left; font-size: 13px; font-weight: 500; }
-.admin-table td { padding: 11px 14px; border-bottom: 1px solid #f0f0f0; font-size: 13px; color: #333; }
-.admin-table tr:hover td { background: #f9f9f9; }
-.td-desc { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-/* ═══════════════════════════════════════════
-   PROFIL
-   ═══════════════════════════════════════════ */
-.avatar { width: 72px; height: 72px; border-radius: 50%; background: #2c3e50; color: white; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; margin: 0 auto 12px; }
-.profil-section { border: 1px solid #eee; border-radius: 8px; padding: 20px; }
-.profil-titre { font-size: 15px; color: #2c3e50; margin-bottom: 14px; }
-
-/* ═══════════════════════════════════════════
-   DÉTAIL DEMANDE
-   ═══════════════════════════════════════════ */
-.detail-table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-.detail-table td { padding: 9px 12px; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
-.detail-label { font-weight: bold; color: #555; width: 130px; }
-
-/* ═══════════════════════════════════════════
-   MESSAGES CHARGEMENT / ERREUR
-   ═══════════════════════════════════════════ */
-.chargement-msg { color: #888; text-align: center; padding: 20px; }
-.erreur-connexion { text-align: center; padding: 30px; background: white; border-radius: 8px; }
-.erreur-connexion p { color: #842029; margin-bottom: 8px; }
-
-/* ═══════════════════════════════════════════
-   CORRECTIONS AVERTISSEMENTS VS CODE
-   ═══════════════════════════════════════════ */
-
-/* Navbar admin — couleur différente */
-.navbar-admin { background: #1a252f; }
-
-/* Sous-titre navbar */
-.navbar-subtitle { font-size: 13px; opacity: 0.8; }
-
-/* Actions navbar */
-.navbar-actions { display: flex; gap: 8px; align-items: center; }
-
-/* Filtres admin */
-.admin-filtres { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-
-/* Recherche admin taille fixe */
-.search-admin { width: 200px; }
-
-/* Label accessible masqué visuellement */
-.label-sr {
-    position: absolute;
-    width: 1px; height: 1px;
-    padding: 0; margin: -1px;
-    overflow: hidden;
-    clip: rect(0,0,0,0);
-    white-space: nowrap;
-    border: 0;
-}
-
-/* Cellule chargement table */
-.table-chargement { text-align: center; padding: 20px; color: #888; }
-
-/* Titre demande dans modale statut */
-.statut-demande-titre { color: #555; margin-bottom: 12px; font-size: 14px; }
-
-/* Profil section spacing */
-.profil-section + .profil-section { margin-top: 24px; }
-
-/* Lien bas profil */
-.lien-bas-profil { text-align: center; margin-top: 24px; }
-.lien-bas-profil a { color: #3498db; text-decoration: none; font-size: 14px; }
-
-/* Profil email */
-.profil-email { color: #888; font-size: 14px; }
-
-/* Bouton avec margin top */
-.btn-mt { margin-top: 12px; }
-
-/* Section profil avec espacement */
-.profil-section-mt { margin-top: 24px; }
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -708,3 +708,172 @@ function echapperAttr(texte) {
     if (!texte) return "";
     return texte.replace(/'/g, "&#39;").replace(/"/g, "&quot;");
 }
+
+// ═══════════════════════════════════════════════════════
+//  FONCTIONS UI SUPPLÉMENTAIRES
+// ═══════════════════════════════════════════════════════
+
+// Toggle sidebar mobile
+function toggleSidebar() {
+    document.getElementById("sidebar")?.classList.toggle("open");
+}
+
+// Toggle menu utilisateur
+function toggleUserMenu() {
+    document.getElementById("userMenu")?.classList.toggle("open");
+}
+
+// Fermer menu si clic ailleurs
+document.addEventListener("click", function(e) {
+    const userZone = document.querySelector(".topbar-user");
+    const menu = document.getElementById("userMenu");
+    if (menu && userZone && !userZone.contains(e.target)) {
+        menu.classList.remove("open");
+    }
+});
+
+// Afficher/masquer mot de passe
+function togglePassword(fieldId, btn) {
+    const field = document.getElementById(fieldId);
+    if (!field) return;
+    if (field.type === "password") {
+        field.type = "text";
+        btn.innerHTML = '<i class="bi bi-eye-slash-fill"></i>';
+    } else {
+        field.type = "password";
+        btn.innerHTML = '<i class="bi bi-eye-fill"></i>';
+    }
+}
+
+// Sélectionner type de demande via radio
+function setType(valeur) {
+    const el = document.getElementById("type");
+    if (el) el.value = valeur;
+}
+
+// Initialiser avatar dans topbar
+function initTopbar() {
+    const nom = localStorage.getItem("nom") || "";
+    const avatarEl = document.getElementById("topbarAvatar");
+    const nomEl    = document.getElementById("topbarNom") || document.getElementById("nomUtilisateur");
+    if (avatarEl) avatarEl.textContent = nom.charAt(0).toUpperCase() || "?";
+    if (nomEl)    nomEl.textContent    = nom;
+}
+
+// Afficher message avec classes Bootstrap
+function afficherMessage(elementId, texte, type) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+    el.textContent = texte;
+    el.className   = type === "succes"
+        ? "alert alert-success"
+        : "alert alert-danger";
+    el.classList.remove("d-none");
+    setTimeout(() => { el.classList.add("d-none"); }, 4500);
+}
+
+// Afficher les demandes avec les nouvelles classes CSS
+function afficherPage() {
+    const container = document.getElementById("listeDemandes");
+    if (!container) return;
+    container.innerHTML = "";
+
+    if (demandesFiltrees.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon"><i class="bi bi-folder2-open"></i></div>
+                <div class="empty-state-title">Aucune demande trouvée</div>
+                <div class="empty-state-desc">Vous n'avez pas encore de demandes ou aucun résultat ne correspond à votre recherche.</div>
+                <a href="demande.html" class="btn btn-gov">
+                    <i class="bi bi-plus-circle-fill me-2"></i>Créer ma première demande
+                </a>
+            </div>`;
+        document.getElementById("pagination").innerHTML = "";
+        return;
+    }
+
+    const debut = (pageActuelle - 1) * PAR_PAGE;
+    const page  = demandesFiltrees.slice(debut, debut + PAR_PAGE);
+
+    page.forEach(d => {
+        const div = document.createElement("div");
+        div.className = "demande-card";
+        div.innerHTML = `
+            <div class="demande-card-header">
+                <h3 class="demande-card-title">${echapper(d.titre)}</h3>
+                <span class="badge-statut ${badgeClass(d.statut)}">${d.statut}</span>
+            </div>
+            <p class="demande-card-desc">${echapper(d.description)}</p>
+            <p class="demande-card-meta">
+                <i class="bi bi-calendar3"></i>Créée le ${formaterDate(d.created_at)}
+                &nbsp;·&nbsp;
+                <i class="bi bi-hash"></i>N° ${d.id}
+            </p>
+            <div class="demande-card-actions">
+                <button class="btn-voir-dem" onclick="ouvrirDetail(${d.id})">
+                    <i class="bi bi-eye-fill me-1"></i>Voir
+                </button>
+                <button class="btn-modif-dem" onclick="ouvrirModification(${d.id}, '${echapperAttr(d.titre)}', '${echapperAttr(d.description)}')">
+                    <i class="bi bi-pencil-fill me-1"></i>Modifier
+                </button>
+                <button class="btn-suppr-dem" onclick="supprimerDemande(${d.id})">
+                    <i class="bi bi-trash3-fill me-1"></i>Supprimer
+                </button>
+                <button class="btn-print-dem" onclick="imprimerDemandeDirecte(${d.id})">
+                    <i class="bi bi-printer-fill me-1"></i>Imprimer
+                </button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+    afficherPagination();
+}
+
+// Remplacer ouvrirModification pour utiliser la modale Bootstrap
+function ouvrirModification(id, titre, description) {
+    document.getElementById("modifId").value          = id;
+    document.getElementById("modifTitre").value       = titre;
+    document.getElementById("modifDescription").value = description;
+    // Utilise Bootstrap modal si disponible
+    if (typeof bootstrap !== "undefined") {
+        new bootstrap.Modal(document.getElementById("modaleModif")).show();
+    } else {
+        document.getElementById("modaleModif").style.display = "flex";
+    }
+}
+
+function fermerModification() {
+    if (typeof bootstrap !== "undefined") {
+        bootstrap.Modal.getInstance(document.getElementById("modaleModif"))?.hide();
+    } else {
+        document.getElementById("modaleModif").style.display = "none";
+    }
+}
+
+function ouvrirDetail(id) {
+    const d = toutesLesDemandes.find(dem => dem.id === id);
+    if (!d) return;
+    demandeDetailCourante = d;
+    document.getElementById("detailContenu").innerHTML = `
+        <table class="detail-table">
+            <tr><td>Type</td><td><strong>${echapper(d.titre)}</strong></td></tr>
+            <tr><td>Description</td><td>${echapper(d.description)}</td></tr>
+            <tr><td>Statut</td><td><span class="badge-statut ${badgeClass(d.statut)}">${d.statut}</span></td></tr>
+            <tr><td>Date</td><td>${formaterDate(d.created_at)}</td></tr>
+            <tr><td>N° demande</td><td>#${d.id}</td></tr>
+        </table>`;
+    if (typeof bootstrap !== "undefined") {
+        new bootstrap.Modal(document.getElementById("modaleDetail")).show();
+    }
+}
+
+function fermerDetail() {
+    if (typeof bootstrap !== "undefined") {
+        bootstrap.Modal.getInstance(document.getElementById("modaleDetail"))?.hide();
+    }
+}
+
+// Ajouter initTopbar au DOMContentLoaded
+document.addEventListener("DOMContentLoaded", function() {
+    initTopbar();
+});
