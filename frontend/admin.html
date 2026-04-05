@@ -211,7 +211,7 @@
                     <label for="nouveauStatut" class="form-label-gov">Nouveau statut</label>
                     <select
                         id="nouveauStatut"
-                        class="form-select form-control-gov"
+                        class="form-select form-control-gov mb-3"
                         title="Choisir le nouveau statut"
                         aria-label="Nouveau statut">
                         <option value="En attente">⏳ En attente</option>
@@ -219,6 +219,16 @@
                         <option value="Terminée">✅ Terminée</option>
                         <option value="Refusée">❌ Refusée</option>
                     </select>
+                    <label for="commentaireAdmin" class="form-label-gov mt-2">
+                        <i class="bi bi-chat-left-text-fill me-1"></i>
+                        Réponse / Message au citoyen
+                    </label>
+                    <textarea
+                        id="commentaireAdmin"
+                        class="form-control form-control-gov"
+                        rows="3"
+                        placeholder="Ex: Votre demande est approuvée. Venez retirer votre document le 15/04/2026 au bureau 12. OU : Demande refusée car il manque votre CIN."></textarea>
+                    <div class="form-hint mt-1">Ce message sera visible par le citoyen dans sa demande.</div>
                 </div>
                 <div class="modal-footer modal-footer-gov">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="fermerStatut()">

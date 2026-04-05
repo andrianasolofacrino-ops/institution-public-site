@@ -8,188 +8,325 @@ app.use(express.json());
 
 const PORT = 3000;
 
-// ─── Connexion MySQL ──────────────────────────────────
+// ─── Connexion MySQL ───────────────────────────────────
 const db = mysql.createConnection({
-    host: "localhost", user: "root", password: "", database: "institution_db"
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "institution_db"
 });
 
 db.connect(err => {
-    if (err) { console.error("Erreur MySQL :", err); }
-    else     { console.log("Connexion MySQL réussie"); }
+    if (err) { console.error("❌ Erreur MySQL :", err.message); }
+    else      { console.log("✅ Connexion MySQL réussie"); }
 });
 
-// ─── Route test ───────────────────────────────────────
-app.get("/", (req, res) => res.send("Serveur OK"));
+// ─── Route test ────────────────────────────────────────
+app.get("/", (req, res) => {
+    res.json({ message: "Serveur CommuneService OK", version: "2.0" });
+});
 
-// ─── INSCRIPTION ──────────────────────────────────────
+// ══════════════════════════════════════════════════════
+//  AUTHENTIFICATION
+// ══════════════════════════════════════════════════════
+
+// Inscription
 app.post("/register", (req, res) => {
     const { nom, email, password } = req.body;
 
+    if (!nom || !email || !password) {
+        return res.status(400).json({ message: "Tous les champs sont requis" });
+    }
+
     db.query("SELECT id FROM users WHERE email = ?", [email], (err, existing) => {
         if (err) return res.status(500).json({ message: "Erreur serveur" });
-        if (existing.length > 0) return res.status(400).json({ message: "Email déjà utilisé" });
+        if (existing.length > 0) {
+            return res.status(400).json({ message: "Cet email est déjà utilisé" });
+        }
 
         db.query(
-            "INSERT INTO users (nom, email, password) VALUES (?, ?, ?)",
+            "INSERT INTO users (nom, email, password, is_admin) VALUES (?, ?, ?, 0)",
             [nom, email, password],
             (err) => {
-                if (err) return res.status(500).json({ message: "Erreur inscription" });
+                if (err) return res.status(500).json({ message: "Erreur lors de l'inscription" });
                 res.json({ message: "Inscription réussie !" });
             }
         );
     });
 });
 
-// ─── CONNEXION ────────────────────────────────────────
+// Connexion — retourne isAdmin pour redirection automatique
 app.post("/login", (req, res) => {
     const { email, password } = req.body;
 
+    if (!email || !password) {
+        return res.status(400).json({ message: "Email et mot de passe requis" });
+    }
+
     db.query(
-        "SELECT * FROM users WHERE email = ? AND password = ?",
+        "SELECT id, nom, email, is_admin FROM users WHERE email = ? AND password = ?",
         [email, password],
         (err, result) => {
             if (err) return res.status(500).json({ message: "Erreur serveur" });
-            if (result.length === 0) return res.status(401).json({ message: "Email ou mot de passe incorrect" });
+            if (result.length === 0) {
+                return res.status(401).json({ message: "Email ou mot de passe incorrect" });
+            }
 
             const user = result[0];
+            // ✅ On retourne isAdmin pour que le frontend redirige vers la bonne page
             res.json({
                 message : "Connexion réussie",
                 userId  : user.id,
                 nom     : user.nom,
+                email   : user.email,
                 isAdmin : user.is_admin === 1
             });
         }
     );
 });
 
-// ─── PROFIL — voir ────────────────────────────────────
+// ══════════════════════════════════════════════════════
+//  PROFIL UTILISATEUR
+// ══════════════════════════════════════════════════════
+
+// Voir profil
 app.get("/users/:id", (req, res) => {
     db.query(
-        "SELECT id, nom, email FROM users WHERE id = ?",
+        "SELECT id, nom, email, is_admin FROM users WHERE id = ?",
         [req.params.id],
         (err, result) => {
-            if (err) return res.status(500).json({ message: "Erreur" });
+            if (err) return res.status(500).json({ message: "Erreur serveur" });
             if (result.length === 0) return res.status(404).json({ message: "Utilisateur non trouvé" });
             res.json(result[0]);
         }
     );
 });
 
-// ─── PROFIL — modifier nom ────────────────────────────
+// Modifier nom
 app.put("/users/:id", (req, res) => {
     const { nom } = req.body;
+    if (!nom) return res.status(400).json({ message: "Nom requis" });
+
     db.query(
         "UPDATE users SET nom = ? WHERE id = ?",
         [nom, req.params.id],
         (err) => {
-            if (err) return res.status(500).json({ message: "Erreur" });
-            res.json({ message: "Nom modifié" });
+            if (err) return res.status(500).json({ message: "Erreur serveur" });
+            res.json({ message: "Nom modifié avec succès" });
         }
     );
 });
 
-// ─── PROFIL — changer mot de passe ───────────────────
+// Changer mot de passe
 app.put("/users/:id/password", (req, res) => {
     const { ancienPassword, nouveauPassword } = req.body;
 
     db.query(
-        "SELECT * FROM users WHERE id = ? AND password = ?",
+        "SELECT id FROM users WHERE id = ? AND password = ?",
         [req.params.id, ancienPassword],
         (err, result) => {
-            if (err) return res.status(500).json({ message: "Erreur" });
-            if (result.length === 0) return res.json({ success: false, message: "Ancien mot de passe incorrect" });
+            if (err) return res.status(500).json({ message: "Erreur serveur" });
+            if (result.length === 0) {
+                return res.json({ success: false, message: "Ancien mot de passe incorrect" });
+            }
 
             db.query(
                 "UPDATE users SET password = ? WHERE id = ?",
                 [nouveauPassword, req.params.id],
                 (err) => {
-                    if (err) return res.status(500).json({ message: "Erreur" });
-                    res.json({ success: true, message: "Mot de passe changé" });
+                    if (err) return res.status(500).json({ message: "Erreur serveur" });
+                    res.json({ success: true, message: "Mot de passe changé avec succès" });
                 }
             );
         }
     );
 });
 
-// ─── DEMANDES — ajouter ───────────────────────────────
+// ══════════════════════════════════════════════════════
+//  DEMANDES — CÔTÉ CITOYEN
+// ══════════════════════════════════════════════════════
+
+// Créer une demande
 app.post("/demandes", (req, res) => {
     const { user_id, titre, description } = req.body;
+
     if (!user_id) return res.status(400).json({ message: "Utilisateur non identifié" });
+    if (!titre)   return res.status(400).json({ message: "Type de demande requis" });
+    if (!description) return res.status(400).json({ message: "Description requise" });
 
     db.query(
-        "INSERT INTO demandes (user_id, titre, description, statut) VALUES (?, ?, ?, ?)",
-        [user_id, titre, description, "En attente"],
-        (err) => {
-            if (err) return res.status(500).json({ message: "Erreur ajout" });
-            res.json({ message: "Demande ajoutée avec succès" });
+        "INSERT INTO demandes (user_id, titre, description, statut) VALUES (?, ?, ?, 'En attente')",
+        [user_id, titre, description],
+        (err, result) => {
+            if (err) return res.status(500).json({ message: "Erreur lors de la création" });
+            res.json({
+                message    : "Demande soumise avec succès",
+                demandeId  : result.insertId
+            });
         }
     );
 });
 
-// ─── DEMANDES — récupérer (par utilisateur) ───────────
+// Récupérer les demandes d'un citoyen (avec commentaire admin)
 app.get("/demandes", (req, res) => {
     const { userId } = req.query;
     if (!userId) return res.status(400).json({ message: "userId manquant" });
 
     db.query(
-        "SELECT * FROM demandes WHERE user_id = ? ORDER BY created_at DESC",
+        `SELECT id, titre, description, statut, commentaire_admin,
+                created_at, updated_at
+         FROM demandes
+         WHERE user_id = ?
+         ORDER BY created_at DESC`,
         [userId],
         (err, result) => {
-            if (err) return res.status(500).json({ message: "Erreur" });
+            if (err) return res.status(500).json({ message: "Erreur serveur" });
             res.json(result);
         }
     );
 });
 
-// ─── DEMANDES — modifier ──────────────────────────────
+// Modifier une demande — seulement si statut "En attente"
 app.put("/demandes/:id", (req, res) => {
     const { titre, description } = req.body;
+
+    // Vérifier le statut avant modification
     db.query(
-        "UPDATE demandes SET titre = ?, description = ? WHERE id = ?",
-        [titre, description, req.params.id],
-        (err) => {
-            if (err) return res.status(500).json({ message: "Erreur modification" });
-            res.json({ message: "Demande modifiée" });
+        "SELECT statut FROM demandes WHERE id = ?",
+        [req.params.id],
+        (err, result) => {
+            if (err) return res.status(500).json({ message: "Erreur serveur" });
+            if (result.length === 0) return res.status(404).json({ message: "Demande introuvable" });
+
+            if (result[0].statut !== "En attente") {
+                return res.status(403).json({
+                    message: "Impossible de modifier : cette demande est déjà en cours de traitement"
+                });
+            }
+
+            db.query(
+                "UPDATE demandes SET titre = ?, description = ? WHERE id = ?",
+                [titre, description, req.params.id],
+                (err) => {
+                    if (err) return res.status(500).json({ message: "Erreur modification" });
+                    res.json({ message: "Demande modifiée avec succès" });
+                }
+            );
         }
     );
 });
 
-// ─── DEMANDES — supprimer ─────────────────────────────
+// Supprimer une demande — seulement si statut "En attente"
 app.delete("/demandes/:id", (req, res) => {
+    db.query(
+        "SELECT statut FROM demandes WHERE id = ?",
+        [req.params.id],
+        (err, result) => {
+            if (err) return res.status(500).json({ message: "Erreur serveur" });
+            if (result.length === 0) return res.status(404).json({ message: "Demande introuvable" });
+
+            if (result[0].statut !== "En attente") {
+                return res.status(403).json({
+                    message: "Impossible de supprimer : cette demande est en cours de traitement"
+                });
+            }
+
+            db.query("DELETE FROM demandes WHERE id = ?", [req.params.id], (err) => {
+                if (err) return res.status(500).json({ message: "Erreur suppression" });
+                res.json({ message: "Demande supprimée" });
+            });
+        }
+    );
+});
+
+// ══════════════════════════════════════════════════════
+//  ADMIN — Gestion de toutes les demandes
+// ══════════════════════════════════════════════════════
+
+// Voir TOUTES les demandes avec nom du citoyen
+app.get("/admin/demandes", (req, res) => {
+    db.query(
+        `SELECT d.id, d.titre, d.description, d.statut,
+                d.commentaire_admin, d.created_at, d.updated_at,
+                u.id AS user_id, u.nom AS user_nom, u.email AS user_email
+         FROM demandes d
+         JOIN users u ON d.user_id = u.id
+         ORDER BY
+            CASE d.statut
+                WHEN 'En attente' THEN 1
+                WHEN 'En cours'   THEN 2
+                WHEN 'Terminée'   THEN 3
+                WHEN 'Refusée'    THEN 4
+            END,
+            d.created_at DESC`,
+        (err, result) => {
+            if (err) return res.status(500).json({ message: "Erreur serveur" });
+            res.json(result);
+        }
+    );
+});
+
+// ✅ NOUVEAU : Admin change statut ET écrit une réponse au citoyen
+app.put("/admin/demandes/:id/statut", (req, res) => {
+    const { statut, commentaire_admin } = req.body;
+
+    const statutsValides = ["En attente", "En cours", "Terminée", "Refusée"];
+    if (!statutsValides.includes(statut)) {
+        return res.status(400).json({ message: "Statut invalide" });
+    }
+
+    db.query(
+        `UPDATE demandes
+         SET statut = ?, commentaire_admin = ?, updated_at = NOW()
+         WHERE id = ?`,
+        [statut, commentaire_admin || null, req.params.id],
+        (err) => {
+            if (err) return res.status(500).json({ message: "Erreur serveur" });
+            res.json({ message: "Demande mise à jour avec succès" });
+        }
+    );
+});
+
+// Admin supprime n'importe quelle demande
+app.delete("/admin/demandes/:id", (req, res) => {
     db.query("DELETE FROM demandes WHERE id = ?", [req.params.id], (err) => {
         if (err) return res.status(500).json({ message: "Erreur suppression" });
         res.json({ message: "Demande supprimée" });
     });
 });
 
-// ─── ADMIN — toutes les demandes ──────────────────────
-app.get("/admin/demandes", (req, res) => {
-    const sql = `
-        SELECT d.*, u.nom AS user_nom
-        FROM demandes d
-        JOIN users u ON d.user_id = u.id
-        ORDER BY d.created_at DESC
-    `;
-    db.query(sql, (err, result) => {
-        if (err) return res.status(500).json({ message: "Erreur" });
-        res.json(result);
-    });
-});
-
-// ─── ADMIN — changer statut ───────────────────────────
-app.put("/admin/demandes/:id/statut", (req, res) => {
-    const { statut } = req.body;
+// Statistiques globales pour admin
+app.get("/admin/stats", (req, res) => {
     db.query(
-        "UPDATE demandes SET statut = ? WHERE id = ?",
-        [statut, req.params.id],
-        (err) => {
-            if (err) return res.status(500).json({ message: "Erreur" });
-            res.json({ message: "Statut mis à jour" });
+        `SELECT
+            COUNT(*) AS total,
+            SUM(statut = 'En attente') AS en_attente,
+            SUM(statut = 'En cours')   AS en_cours,
+            SUM(statut = 'Terminée')   AS terminees,
+            SUM(statut = 'Refusée')    AS refusees,
+            COUNT(DISTINCT user_id)    AS total_citoyens
+         FROM demandes`,
+        (err, result) => {
+            if (err) return res.status(500).json({ message: "Erreur serveur" });
+            res.json(result[0]);
         }
     );
 });
 
-// ─── Lancer serveur ───────────────────────────────────
-app.listen(PORT, () => console.log(`Serveur démarré sur http://localhost:${PORT}`));
+// ─── Lancer serveur ────────────────────────────────────
+app.listen(PORT, () => {
+    console.log(`\n🚀 Serveur CommuneService démarré`);
+    console.log(`📡 http://localhost:${PORT}`);
+    console.log(`\nRoutes disponibles :`);
+    console.log(`  POST   /register`);
+    console.log(`  POST   /login`);
+    console.log(`  GET    /demandes?userId=X`);
+    console.log(`  POST   /demandes`);
+    console.log(`  PUT    /demandes/:id`);
+    console.log(`  DELETE /demandes/:id`);
+    console.log(`  GET    /admin/demandes`);
+    console.log(`  PUT    /admin/demandes/:id/statut`);
+    console.log(`  GET    /admin/stats\n`);
+});
 
 module.exports = db;

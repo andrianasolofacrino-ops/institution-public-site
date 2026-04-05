@@ -833,3 +833,74 @@ a { text-decoration: none; }
 
 /* Statut demande titre dans modale */
 .statut-demande-titre { font-size: 14px; }
+
+/* ═══════════════════════════════════════════════════════
+   RÉPONSE ADMIN — visible par le citoyen
+   ═══════════════════════════════════════════════════════ */
+.reponse-admin {
+    background: #e8f4fd;
+    border-left: 4px solid var(--gov-blue);
+    border-radius: 0 8px 8px 0;
+    padding: 10px 14px;
+    margin: 10px 0;
+    font-size: 13px;
+    color: var(--gray-800);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+.reponse-admin i { color: var(--gov-blue); margin-top: 2px; flex-shrink: 0; }
+.reponse-admin strong { color: var(--gov-blue); }
+
+/* Bouton "En cours de traitement" */
+.badge-statut-info {
+    display: inline-flex;
+    align-items: center;
+    background: var(--gray-100);
+    color: var(--gray-600);
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-style: italic;
+}
+
+/* ═══════════════════════════════════════════════════════
+   ADMIN TABLE — infos citoyen
+   ═══════════════════════════════════════════════════════ */
+.admin-citoyen-info { display: flex; flex-direction: column; gap: 2px; }
+.admin-citoyen-nom  { font-size: 13px; font-weight: 500; color: var(--gray-800); }
+.admin-citoyen-email { font-size: 11px; color: var(--gray-400); }
+
+/* Boutons actions admin dans tableau */
+.admin-actions { display: flex; gap: 6px; align-items: center; }
+.btn-admin-traiter {
+    background: var(--gov-blue);
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: inline-flex;
+    align-items: center;
+}
+.btn-admin-traiter:hover { background: var(--gov-blue-dark); }
+.btn-admin-suppr {
+    background: #fee2e2;
+    color: #991b1b;
+    border: none;
+    padding: 5px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-admin-suppr:hover { background: #dc2626; color: white; }
+
+/* Type option sélectionnée */
+.type-option-content.selected {
+    border-color: var(--gov-blue);
+    background: var(--gov-blue-light);
+    color: var(--gov-blue);
+}
