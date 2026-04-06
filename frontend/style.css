@@ -986,3 +986,6 @@ a { text-decoration: none; }
     color: var(--gray-400, #94a3b8);
     font-style: italic;
 }
+
+/* Page 404 */
+.pied-404 { font-size: 13px; color: #94a3b8; }
