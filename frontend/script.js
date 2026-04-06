@@ -712,12 +712,18 @@ function afficherTableAdmin(demandes) {
             <td class="td-desc" title="${echapperAttr(d.description)}">${echapper(d.description)}</td>
             <td><span class="badge-statut ${badgeClass(d.statut)}">${d.statut}</span></td>
             <td>
+                ${d.commentaire_admin
+                    ? `<span class="reponse-admin-cell" title="${echapperAttr(d.commentaire_admin)}">${echapper(d.commentaire_admin.substring(0,40))}${d.commentaire_admin.length > 40 ? '...' : ''}</span>`
+                    : '<span class="pas-de-reponse">Pas encore</span>'
+                }
+            </td>
+            <td>
                 <div>${formaterDate(d.created_at)}</div>
                 ${d.updated_at ? `<div class="text-muted" style="font-size:11px">Traité ${formaterDate(d.updated_at)}</div>` : ""}
             </td>
             <td>
                 <div class="admin-actions">
-                    <button class="btn-admin-traiter" onclick="ouvrirChangementStatut(${d.id}, '${echapperAttr(d.titre)}', '${d.statut}', '${echapperAttr(d.commentaire_admin || "")}')">
+                    <button class="btn-admin-traiter" onclick="ouvrirChangementStatut(${d.id}, '${echapperAttr(d.titre)}', '${d.statut}', '${echapperAttr(d.commentaire_admin || "")}', '${echapperAttr(d.description || "")}', '${echapperAttr(d.user_nom || "")}')">
                         <i class="bi bi-pencil-fill me-1"></i>Traiter
                     </button>
                     <button class="btn-admin-suppr" onclick="supprimerAdmin(${d.id})">

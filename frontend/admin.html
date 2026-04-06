@@ -7,6 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Marianne:wght@400;500;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="page-app">
@@ -44,19 +45,15 @@
     </header>
 
     <div class="app-layout">
-
         <aside class="sidebar sidebar-admin" id="sidebar">
             <nav class="sidebar-nav" aria-label="Navigation admin">
                 <div class="sidebar-section-label">Administration</div>
                 <a href="admin.html" class="sidebar-link active">
                     <i class="bi bi-speedometer2" aria-hidden="true"></i><span>Tableau de bord</span>
                 </a>
-                <a href="#" class="sidebar-link" onclick="filtrerAdmin(); return false;">
-                    <i class="bi bi-list-ul" aria-hidden="true"></i><span>Toutes les demandes</span>
-                </a>
                 <div class="sidebar-section-label mt-3">Mon espace</div>
                 <a href="dashboard.html" class="sidebar-link">
-                    <i class="bi bi-grid-fill" aria-hidden="true"></i><span>Dashboard citoyen</span>
+                    <i class="bi bi-grid-fill" aria-hidden="true"></i><span>Espace citoyen</span>
                 </a>
                 <a href="profil.html" class="sidebar-link">
                     <i class="bi bi-person-circle" aria-hidden="true"></i><span>Mon profil</span>
@@ -74,15 +71,20 @@
                     <h1 class="page-title">Administration</h1>
                     <p class="page-subtitle">Gestion de toutes les demandes des citoyens</p>
                 </div>
-                <div class="admin-header-badge">
-                    <i class="bi bi-shield-fill-check me-1" aria-hidden="true"></i>
-                    Accès administrateur
+                <div class="d-flex gap-2 align-items-center">
+                    <button class="btn btn-gov-green" onclick="exporterCSV()" title="Exporter toutes les demandes en CSV">
+                        <i class="bi bi-download me-1" aria-hidden="true"></i>Exporter CSV
+                    </button>
+                    <div class="admin-header-badge">
+                        <i class="bi bi-shield-fill-check me-1" aria-hidden="true"></i>
+                        Administrateur
+                    </div>
                 </div>
             </div>
 
             <div id="msgAdmin" class="alert d-none mb-4" role="alert"></div>
 
-            <!-- STATS GLOBALES -->
+            <!-- STATS -->
             <div class="row g-3 mb-4">
                 <div class="col-6 col-lg-3">
                     <div class="stat-card-pro">
@@ -130,6 +132,32 @@
                 </div>
             </div>
 
+            <!-- GRAPHIQUE -->
+            <div class="row g-3 mb-4">
+                <div class="col-lg-5">
+                    <div class="chart-card">
+                        <div class="chart-card-header">
+                            <i class="bi bi-pie-chart-fill me-2" aria-hidden="true"></i>
+                            Répartition par statut
+                        </div>
+                        <div class="chart-card-body">
+                            <canvas id="chartStatut" aria-label="Graphique des demandes par statut" role="img"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="chart-card">
+                        <div class="chart-card-header">
+                            <i class="bi bi-bar-chart-fill me-2" aria-hidden="true"></i>
+                            Demandes par type de document
+                        </div>
+                        <div class="chart-card-body">
+                            <canvas id="chartType" aria-label="Graphique des demandes par type" role="img"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- FILTRES -->
             <div class="admin-filtres-bar">
                 <div class="filters-bar-left">
@@ -137,12 +165,7 @@
                 </div>
                 <div class="admin-filtres-right">
                     <label for="adminFiltreStatut" class="label-sr">Filtrer par statut</label>
-                    <select
-                        id="adminFiltreStatut"
-                        class="form-select select-filter"
-                        onchange="filtrerAdmin()"
-                        title="Filtrer par statut"
-                        aria-label="Filtrer par statut">
+                    <select id="adminFiltreStatut" class="form-select select-filter" onchange="filtrerAdmin()" title="Filtrer par statut" aria-label="Filtrer par statut">
                         <option value="">Tous les statuts</option>
                         <option value="En attente">En attente</option>
                         <option value="En cours">En cours</option>
@@ -152,13 +175,7 @@
                     <div class="search-wrap">
                         <i class="bi bi-search search-icon" aria-hidden="true"></i>
                         <label for="adminSearch" class="label-sr">Rechercher</label>
-                        <input
-                            type="text"
-                            id="adminSearch"
-                            class="form-control search-input-pro"
-                            placeholder="Rechercher..."
-                            oninput="filtrerAdmin()"
-                            aria-label="Rechercher une demande">
+                        <input type="text" id="adminSearch" class="form-control search-input-pro" placeholder="Rechercher citoyen ou demande..." oninput="filtrerAdmin()" aria-label="Rechercher">
                     </div>
                 </div>
             </div>
@@ -166,25 +183,26 @@
             <!-- TABLEAU -->
             <div class="admin-table-card">
                 <div class="table-wrapper">
-                    <table class="admin-table" id="adminTable" aria-label="Liste de toutes les demandes">
+                    <table class="admin-table" aria-label="Liste de toutes les demandes">
                         <thead>
                             <tr>
-                                <th scope="col">ID</th>
+                                <th scope="col">N°</th>
                                 <th scope="col">Citoyen</th>
                                 <th scope="col">Type de demande</th>
                                 <th scope="col">Description</th>
                                 <th scope="col">Statut</th>
+                                <th scope="col">Réponse admin</th>
                                 <th scope="col">Date</th>
                                 <th scope="col">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="adminTableBody">
                             <tr>
-                                <td colspan="7" class="text-center p-4 text-muted">
+                                <td colspan="8" class="text-center p-4 text-muted">
                                     <div class="spinner-border spinner-border-sm me-2" role="status">
                                         <span class="visually-hidden">Chargement...</span>
                                     </div>
-                                    Chargement des demandes...
+                                    Chargement...
                                 </td>
                             </tr>
                         </tbody>
@@ -195,47 +213,56 @@
         </main>
     </div>
 
-    <!-- MODALE STATUT -->
+    <!-- MODALE TRAITEMENT -->
     <div class="modal fade" id="modaleStatut" tabindex="-1" aria-labelledby="modaleStatutLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content modal-gov">
                 <div class="modal-header modal-header-gov">
                     <h5 class="modal-title" id="modaleStatutLabel">
-                        <i class="bi bi-arrow-repeat me-2" aria-hidden="true"></i>Changer le statut
+                        <i class="bi bi-pencil-square me-2" aria-hidden="true"></i>Traiter la demande
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
                 </div>
                 <div class="modal-body p-4">
                     <input type="hidden" id="statutDemandeId">
-                    <p id="statutDemandeTitre" class="text-muted mb-3 statut-demande-titre"></p>
-                    <label for="nouveauStatut" class="form-label-gov">Nouveau statut</label>
-                    <select
-                        id="nouveauStatut"
-                        class="form-select form-control-gov mb-3"
-                        title="Choisir le nouveau statut"
-                        aria-label="Nouveau statut">
-                        <option value="En attente">⏳ En attente</option>
-                        <option value="En cours">🔄 En cours</option>
-                        <option value="Terminée">✅ Terminée</option>
-                        <option value="Refusée">❌ Refusée</option>
-                    </select>
-                    <label for="commentaireAdmin" class="form-label-gov mt-2">
-                        <i class="bi bi-chat-left-text-fill me-1"></i>
-                        Réponse / Message au citoyen
-                    </label>
-                    <textarea
-                        id="commentaireAdmin"
-                        class="form-control form-control-gov"
-                        rows="3"
-                        placeholder="Ex: Votre demande est approuvée. Venez retirer votre document le 15/04/2026 au bureau 12. OU : Demande refusée car il manque votre CIN."></textarea>
-                    <div class="form-hint mt-1">Ce message sera visible par le citoyen dans sa demande.</div>
+
+                    <!-- Info demande -->
+                    <div class="demande-info-box mb-4">
+                        <div class="demande-info-label">Demande concernée</div>
+                        <div id="statutDemandeTitre" class="demande-info-titre"></div>
+                        <div id="statutDemandeDesc" class="demande-info-desc"></div>
+                        <div id="statutDemandeCitoyen" class="demande-info-citoyen"></div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-5">
+                            <label for="nouveauStatut" class="form-label-gov">
+                                <i class="bi bi-arrow-repeat me-1" aria-hidden="true"></i>Changer le statut
+                            </label>
+                            <select id="nouveauStatut" class="form-select form-control-gov" title="Nouveau statut" aria-label="Nouveau statut">
+                                <option value="En attente">⏳ En attente</option>
+                                <option value="En cours">🔄 En cours de traitement</option>
+                                <option value="Terminée">✅ Terminée — Document prêt</option>
+                                <option value="Refusée">❌ Refusée</option>
+                            </select>
+                        </div>
+                        <div class="col-md-7">
+                            <label for="commentaireAdmin" class="form-label-gov">
+                                <i class="bi bi-chat-left-text-fill me-1" aria-hidden="true"></i>Message au citoyen
+                            </label>
+                            <textarea id="commentaireAdmin" class="form-control form-control-gov" rows="4"
+                                placeholder="Ex : Votre certificat de résidence est prêt. Venez le retirer au bureau 12 avec votre CIN.&#10;&#10;OU : Demande refusée. Il manque une photocopie de votre CIN. Veuillez soumettre une nouvelle demande."></textarea>
+                            <div class="form-hint mt-1">
+                                <i class="bi bi-info-circle me-1" aria-hidden="true"></i>
+                                Ce message sera visible par le citoyen dans sa demande.
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer modal-footer-gov">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="fermerStatut()">
-                        Annuler
-                    </button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
                     <button type="button" class="btn btn-gov" onclick="sauvegarderStatut()">
-                        <i class="bi bi-check-lg me-1" aria-hidden="true"></i>Confirmer
+                        <i class="bi bi-check-lg me-1" aria-hidden="true"></i>Confirmer le traitement
                     </button>
                 </div>
             </div>
@@ -244,5 +271,131 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="script.js"></script>
+    <script>
+        // Graphiques Chart.js — initialisés après chargement des données
+        let chartStatut = null;
+        let chartType   = null;
+
+        function initGraphiques(demandes) {
+            // Données statut
+            const stats = {
+                "En attente" : demandes.filter(d => d.statut === "En attente").length,
+                "En cours"   : demandes.filter(d => d.statut === "En cours").length,
+                "Terminée"   : demandes.filter(d => d.statut === "Terminée").length,
+                "Refusée"    : demandes.filter(d => d.statut === "Refusée").length
+            };
+
+            // Graphique camembert — statuts
+            const ctxStatut = document.getElementById("chartStatut");
+            if (ctxStatut) {
+                if (chartStatut) chartStatut.destroy();
+                chartStatut = new Chart(ctxStatut, {
+                    type: "doughnut",
+                    data: {
+                        labels: Object.keys(stats),
+                        datasets: [{
+                            data: Object.values(stats),
+                            backgroundColor: ["#fbbf24","#3b82f6","#22c55e","#ef4444"],
+                            borderWidth: 2,
+                            borderColor: "#fff"
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: "bottom", labels: { font: { size: 12 }, padding: 16 } }
+                        },
+                        cutout: "60%"
+                    }
+                });
+            }
+
+            // Données par type de document
+            const typeCount = {};
+            demandes.forEach(d => {
+                const court = d.titre.replace("Certificat de ", "Cert. ").replace("Légalisation de document","Légalisation").replace("Autre demande","Autre");
+                typeCount[court] = (typeCount[court] || 0) + 1;
+            });
+
+            // Graphique barres — types
+            const ctxType = document.getElementById("chartType");
+            if (ctxType) {
+                if (chartType) chartType.destroy();
+                chartType = new Chart(ctxType, {
+                    type: "bar",
+                    data: {
+                        labels: Object.keys(typeCount),
+                        datasets: [{
+                            label: "Nombre de demandes",
+                            data: Object.values(typeCount),
+                            backgroundColor: "#003189",
+                            borderRadius: 6,
+                            borderSkipped: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, ticks: { stepSize: 1 } },
+                            x: { ticks: { font: { size: 11 } } }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Export CSV
+        function exporterCSV() {
+            if (!toutesDemandesAdmin || toutesDemandesAdmin.length === 0) {
+                afficherToast("Aucune donnée à exporter", "warning");
+                return;
+            }
+
+            const entetes = ["ID","Citoyen","Email","Type","Description","Statut","Réponse admin","Date dépôt","Date traitement"];
+            const lignes  = toutesDemandesAdmin.map(d => [
+                d.id,
+                `"${(d.user_nom || "").replace(/"/g,'""')}"`,
+                `"${(d.user_email || "").replace(/"/g,'""')}"`,
+                `"${(d.titre || "").replace(/"/g,'""')}"`,
+                `"${(d.description || "").replace(/"/g,'""')}"`,
+                d.statut,
+                `"${(d.commentaire_admin || "").replace(/"/g,'""')}"`,
+                d.created_at ? new Date(d.created_at).toLocaleDateString("fr-FR") : "",
+                d.updated_at ? new Date(d.updated_at).toLocaleDateString("fr-FR") : ""
+            ]);
+
+            const csv     = [entetes.join(","), ...lignes.map(l => l.join(","))].join("\n");
+            const blob    = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+            const url     = URL.createObjectURL(blob);
+            const lien    = document.createElement("a");
+            lien.href     = url;
+            lien.download = `demandes_${new Date().toISOString().slice(0,10)}.csv`;
+            lien.click();
+            URL.revokeObjectURL(url);
+            afficherToast("Export CSV téléchargé !", "success");
+        }
+
+        // Override afficherTableAdmin pour mettre à jour les graphiques
+        const _afficherTableAdminOriginal = afficherTableAdmin;
+        function afficherTableAdmin(demandes) {
+            _afficherTableAdminOriginal(demandes);
+            initGraphiques(toutesDemandesAdmin);
+        }
+
+        // Override ouvrirChangementStatut pour afficher plus d'infos
+        function ouvrirChangementStatut(id, titre, statutActuel, commentaireActuel, description, userNom) {
+            document.getElementById("statutDemandeId").value       = id;
+            document.getElementById("statutDemandeTitre").textContent   = titre;
+            document.getElementById("statutDemandeDesc").textContent    = description || "";
+            document.getElementById("statutDemandeCitoyen").textContent = "Citoyen : " + (userNom || "");
+            document.getElementById("nouveauStatut").value         = statutActuel;
+            document.getElementById("commentaireAdmin").value      = commentaireActuel || "";
+            const modal = document.getElementById("modaleStatut");
+            if (typeof bootstrap !== "undefined" && modal) {
+                new bootstrap.Modal(modal).show();
+            }
+        }
+    </script>
 </body>
 </html>
