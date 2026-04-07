@@ -989,3 +989,9 @@ a { text-decoration: none; }
 
 /* Page 404 */
 .pied-404 { font-size: 13px; color: #94a3b8; }
+
+/* Icône erreur connexion serveur */
+.icone-erreur { font-size: 2rem; }
+
+/* Date traitement dans tableau admin */
+.admin-date-traitement { font-size: 11px; color: var(--gray-400, #94a3b8); margin-top: 2px; }

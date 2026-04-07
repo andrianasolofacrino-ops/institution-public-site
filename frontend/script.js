@@ -183,7 +183,7 @@ function chargerDemandes() {
     .catch(() => {
         container.innerHTML = `
             <div class="erreur-connexion">
-                <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size:2rem"></i>
+                <i class="bi bi-exclamation-triangle-fill text-danger icone-erreur" aria-hidden="true"></i>
                 <p class="mt-2"><strong>Impossible de contacter le serveur</strong></p>
                 <p class="text-muted">Vérifiez que <code>node server.js</code> est lancé dans le terminal.</p>
                 <button class="btn btn-gov mt-3" onclick="chargerDemandes()">
@@ -656,7 +656,7 @@ function chargerToutesLesDemandes() {
     .catch(() => {
         const tbody = document.getElementById("adminTableBody");
         if (tbody) tbody.innerHTML = `
-            <tr><td colspan="7" class="text-center p-4 text-danger">
+            <tr><td colspan="8" class="text-center p-4 text-danger">
                 ❌ Impossible de charger les demandes. Vérifiez que le serveur est lancé.
             </td></tr>`;
     });
@@ -695,7 +695,7 @@ function afficherTableAdmin(demandes) {
     if (!tbody) return;
 
     if (demandes.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center p-4 text-muted">Aucune demande trouvée</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center p-4 text-muted">Aucune demande trouvée</td></tr>`;
         return;
     }
 
@@ -719,7 +719,7 @@ function afficherTableAdmin(demandes) {
             </td>
             <td>
                 <div>${formaterDate(d.created_at)}</div>
-                ${d.updated_at ? `<div class="text-muted" style="font-size:11px">Traité ${formaterDate(d.updated_at)}</div>` : ""}
+                ${d.updated_at ? `<div class="admin-date-traitement">Traité ${formaterDate(d.updated_at)}</div>` : ""}
             </td>
             <td>
                 <div class="admin-actions">
@@ -736,11 +736,17 @@ function afficherTableAdmin(demandes) {
 }
 
 // Ouvrir modale traitement admin — avec commentaire
-function ouvrirChangementStatut(id, titre, statutActuel, commentaireActuel) {
-    document.getElementById("statutDemandeId").value    = id;
-    document.getElementById("statutDemandeTitre").textContent = `Demande #${id} — ${titre}`;
-    document.getElementById("nouveauStatut").value      = statutActuel;
-    document.getElementById("commentaireAdmin").value   = commentaireActuel || "";
+function ouvrirChangementStatut(id, titre, statutActuel, commentaireActuel, description, userNom) {
+    document.getElementById("statutDemandeId").value  = id;
+    document.getElementById("nouveauStatut").value    = statutActuel;
+    document.getElementById("commentaireAdmin").value = commentaireActuel || "";
+
+    const titrEl = document.getElementById("statutDemandeTitre");
+    const descEl = document.getElementById("statutDemandeDesc");
+    const citEl  = document.getElementById("statutDemandeCitoyen");
+    if (titrEl) titrEl.textContent = titre || "";
+    if (descEl) descEl.textContent = description || "";
+    if (citEl)  citEl.textContent  = userNom ? "Citoyen : " + userNom : "";
 
     const modal = document.getElementById("modaleStatut");
     if (typeof bootstrap !== "undefined" && modal) {
