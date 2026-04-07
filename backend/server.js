@@ -245,28 +245,58 @@ app.delete("/demandes/:id", (req, res) => {
 
 // Voir TOUTES les demandes avec nom du citoyen
 app.get("/admin/demandes", (req, res) => {
-    db.query(
-        `SELECT d.id, d.titre, d.description, d.statut,
-                d.commentaire_admin, d.created_at, d.updated_at,
-                u.id AS user_id, u.nom AS user_nom, u.email AS user_email
-         FROM demandes d
-         JOIN users u ON d.user_id = u.id
-         ORDER BY
+    // Requête robuste — fonctionne même si commentaire_admin ou updated_at manquent
+    const sql = `
+        SELECT
+            d.id,
+            d.titre,
+            d.description,
+            d.statut,
+            d.created_at,
+            COALESCE(d.commentaire_admin, '') AS commentaire_admin,
+            d.updated_at,
+            u.id   AS user_id,
+            u.nom  AS user_nom,
+            u.email AS user_email
+        FROM demandes d
+        JOIN users u ON d.user_id = u.id
+        ORDER BY
             CASE d.statut
                 WHEN 'En attente' THEN 1
                 WHEN 'En cours'   THEN 2
                 WHEN 'Terminée'   THEN 3
                 WHEN 'Refusée'    THEN 4
             END,
-            d.created_at DESC`,
-        (err, result) => {
-            if (err) return res.status(500).json({ message: "Erreur serveur" });
-            res.json(result);
+            d.created_at DESC
+    `;
+
+    db.query(sql, (err, result) => {
+        if (err) {
+            console.error("Erreur /admin/demandes :", err.message);
+
+            // Si la colonne n'existe pas encore → requête simplifiée
+            if (err.code === 'ER_BAD_FIELD_ERROR') {
+                const sqlSimple = `
+                    SELECT
+                        d.id, d.titre, d.description, d.statut, d.created_at,
+                        '' AS commentaire_admin, NULL AS updated_at,
+                        u.id AS user_id, u.nom AS user_nom, u.email AS user_email
+                    FROM demandes d
+                    JOIN users u ON d.user_id = u.id
+                    ORDER BY d.created_at DESC
+                `;
+                return db.query(sqlSimple, (err2, result2) => {
+                    if (err2) return res.status(500).json({ message: "Erreur serveur", detail: err2.message });
+                    res.json(result2);
+                });
+            }
+            return res.status(500).json({ message: "Erreur serveur", detail: err.message });
         }
-    );
+        res.json(result);
+    });
 });
 
-// ✅ NOUVEAU : Admin change statut ET écrit une réponse au citoyen
+// Admin change statut ET écrit une réponse au citoyen
 app.put("/admin/demandes/:id/statut", (req, res) => {
     const { statut, commentaire_admin } = req.body;
 
@@ -275,14 +305,26 @@ app.put("/admin/demandes/:id/statut", (req, res) => {
         return res.status(400).json({ message: "Statut invalide" });
     }
 
+    // Essayer avec commentaire_admin d'abord
     db.query(
-        `UPDATE demandes
-         SET statut = ?, commentaire_admin = ?, updated_at = NOW()
-         WHERE id = ?`,
+        "UPDATE demandes SET statut = ?, commentaire_admin = ? WHERE id = ?",
         [statut, commentaire_admin || null, req.params.id],
         (err) => {
-            if (err) return res.status(500).json({ message: "Erreur serveur" });
-            res.json({ message: "Demande mise à jour avec succès" });
+            if (err && err.code === 'ER_BAD_FIELD_ERROR') {
+                // Colonne pas encore créée → update sans commentaire
+                db.query(
+                    "UPDATE demandes SET statut = ? WHERE id = ?",
+                    [statut, req.params.id],
+                    (err2) => {
+                        if (err2) return res.status(500).json({ message: "Erreur serveur" });
+                        res.json({ message: "Statut mis à jour (sans commentaire — colonne manquante)", needsMigration: true });
+                    }
+                );
+            } else if (err) {
+                return res.status(500).json({ message: "Erreur serveur", detail: err.message });
+            } else {
+                res.json({ message: "Demande mise à jour avec succès" });
+            }
         }
     );
 });
@@ -311,6 +353,24 @@ app.get("/admin/stats", (req, res) => {
             res.json(result[0]);
         }
     );
+});
+
+// ─── Route diagnostic ─────────────────────────────────
+app.get("/diagnostic", (req, res) => {
+    // Vérifier les colonnes de la table demandes
+    db.query("DESCRIBE demandes", (err, cols) => {
+        if (err) return res.status(500).json({ erreur: err.message });
+        const colonnes = cols.map(c => c.Field);
+        res.json({
+            status: "OK",
+            colonnes_demandes: colonnes,
+            has_commentaire_admin: colonnes.includes("commentaire_admin"),
+            has_updated_at: colonnes.includes("updated_at"),
+            message: colonnes.includes("commentaire_admin")
+                ? "✅ Base de données à jour"
+                : "⚠️ Colonnes manquantes — exécutez le SQL de migration"
+        });
+    });
 });
 
 // ─── Lancer serveur ────────────────────────────────────

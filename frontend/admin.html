@@ -376,26 +376,9 @@
             afficherToast("Export CSV téléchargé !", "success");
         }
 
-        // Override afficherTableAdmin pour mettre à jour les graphiques
-        const _afficherTableAdminOriginal = afficherTableAdmin;
-        function afficherTableAdmin(demandes) {
-            _afficherTableAdminOriginal(demandes);
-            initGraphiques(toutesDemandesAdmin);
-        }
-
-        // Override ouvrirChangementStatut pour afficher plus d'infos
-        function ouvrirChangementStatut(id, titre, statutActuel, commentaireActuel, description, userNom) {
-            document.getElementById("statutDemandeId").value       = id;
-            document.getElementById("statutDemandeTitre").textContent   = titre;
-            document.getElementById("statutDemandeDesc").textContent    = description || "";
-            document.getElementById("statutDemandeCitoyen").textContent = "Citoyen : " + (userNom || "");
-            document.getElementById("nouveauStatut").value         = statutActuel;
-            document.getElementById("commentaireAdmin").value      = commentaireActuel || "";
-            const modal = document.getElementById("modaleStatut");
-            if (typeof bootstrap !== "undefined" && modal) {
-                new bootstrap.Modal(modal).show();
-            }
-        }
+        // Les graphiques sont initialisés automatiquement
+        // depuis script.js via chargerToutesLesDemandes → afficherTableAdmin → initGraphiques
+        // Pas besoin d'override ici
     </script>
 </body>
 </html>

@@ -733,6 +733,11 @@ function afficherTableAdmin(demandes) {
             </td>
         </tr>
     `).join("");
+
+    // Mettre à jour les graphiques après affichage du tableau
+    if (typeof initGraphiques === "function") {
+        initGraphiques(toutesDemandesAdmin.length > 0 ? toutesDemandesAdmin : demandes);
+    }
 }
 
 // Ouvrir modale traitement admin — avec commentaire
