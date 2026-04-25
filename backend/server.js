@@ -8,20 +8,43 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
 
-// ─── Connexion MySQL ───────────────────────────────────
+// ─── Connexion MySQL avec reconnexion automatique ──────
 // ✅ Fonctionne en LOCAL et sur RENDER (Railway)
-const db = mysql.createConnection({
-    host     : process.env.DB_HOST     || "localhost",
-    port     : process.env.DB_PORT     || 3306,
-    user     : process.env.DB_USER     || "root",
-    password : process.env.DB_PASSWORD || "",
-    database : process.env.DB_NAME     || "institution_db"
-});
 
-db.connect(err => {
-    if (err) { console.error("❌ Erreur MySQL :", err.message); }
-    else      { console.log("✅ Connexion MySQL réussie"); }
-});
+function creerConnexion() {
+    const connexion = mysql.createConnection({
+        host     : process.env.DB_HOST     || "localhost",
+        port     : parseInt(process.env.DB_PORT) || 3306,
+        user     : process.env.DB_USER     || "root",
+        password : process.env.DB_PASSWORD || "",
+        database : process.env.DB_NAME     || "institution_db",
+        connectTimeout : 60000
+    });
+
+    connexion.connect(err => {
+        if (err) {
+            console.error("❌ Erreur MySQL :", err.message);
+            console.log("🔄 Nouvelle tentative dans 5 secondes...");
+            setTimeout(creerConnexion, 5000);
+        } else {
+            console.log("✅ Connexion MySQL réussie");
+        }
+    });
+
+    connexion.on("error", err => {
+        console.error("❌ Erreur MySQL :", err.message);
+        if (err.code === "PROTOCOL_CONNECTION_LOST" ||
+            err.code === "ECONNRESET" ||
+            err.code === "ETIMEDOUT") {
+            console.log("🔄 Reconnexion automatique...");
+            creerConnexion();
+        }
+    });
+
+    return connexion;
+}
+
+let db = creerConnexion();
 
 // ─── Route test ────────────────────────────────────────
 app.get("/", (req, res) => {
