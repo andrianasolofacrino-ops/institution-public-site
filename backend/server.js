@@ -6,14 +6,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // ─── Connexion MySQL ───────────────────────────────────
+// ✅ Fonctionne en LOCAL et sur RENDER (Railway)
 const db = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "",
-    database: "institution_db"
+    host     : process.env.DB_HOST     || "localhost",
+    port     : process.env.DB_PORT     || 3306,
+    user     : process.env.DB_USER     || "root",
+    password : process.env.DB_PASSWORD || "",
+    database : process.env.DB_NAME     || "institution_db"
 });
 
 db.connect(err => {
@@ -30,20 +32,16 @@ app.get("/", (req, res) => {
 //  AUTHENTIFICATION
 // ══════════════════════════════════════════════════════
 
-// Inscription
 app.post("/register", (req, res) => {
     const { nom, email, password } = req.body;
-
     if (!nom || !email || !password) {
         return res.status(400).json({ message: "Tous les champs sont requis" });
     }
-
     db.query("SELECT id FROM users WHERE email = ?", [email], (err, existing) => {
         if (err) return res.status(500).json({ message: "Erreur serveur" });
         if (existing.length > 0) {
             return res.status(400).json({ message: "Cet email est déjà utilisé" });
         }
-
         db.query(
             "INSERT INTO users (nom, email, password, is_admin) VALUES (?, ?, ?, 0)",
             [nom, email, password],
@@ -55,14 +53,11 @@ app.post("/register", (req, res) => {
     });
 });
 
-// Connexion — retourne isAdmin pour redirection automatique
 app.post("/login", (req, res) => {
     const { email, password } = req.body;
-
     if (!email || !password) {
         return res.status(400).json({ message: "Email et mot de passe requis" });
     }
-
     db.query(
         "SELECT id, nom, email, is_admin FROM users WHERE email = ? AND password = ?",
         [email, password],
@@ -71,9 +66,7 @@ app.post("/login", (req, res) => {
             if (result.length === 0) {
                 return res.status(401).json({ message: "Email ou mot de passe incorrect" });
             }
-
             const user = result[0];
-            // ✅ On retourne isAdmin pour que le frontend redirige vers la bonne page
             res.json({
                 message : "Connexion réussie",
                 userId  : user.id,
@@ -89,7 +82,6 @@ app.post("/login", (req, res) => {
 //  PROFIL UTILISATEUR
 // ══════════════════════════════════════════════════════
 
-// Voir profil
 app.get("/users/:id", (req, res) => {
     db.query(
         "SELECT id, nom, email, is_admin FROM users WHERE id = ?",
@@ -102,25 +94,17 @@ app.get("/users/:id", (req, res) => {
     );
 });
 
-// Modifier nom
 app.put("/users/:id", (req, res) => {
     const { nom } = req.body;
     if (!nom) return res.status(400).json({ message: "Nom requis" });
-
-    db.query(
-        "UPDATE users SET nom = ? WHERE id = ?",
-        [nom, req.params.id],
-        (err) => {
-            if (err) return res.status(500).json({ message: "Erreur serveur" });
-            res.json({ message: "Nom modifié avec succès" });
-        }
-    );
+    db.query("UPDATE users SET nom = ? WHERE id = ?", [nom, req.params.id], (err) => {
+        if (err) return res.status(500).json({ message: "Erreur serveur" });
+        res.json({ message: "Nom modifié avec succès" });
+    });
 });
 
-// Changer mot de passe
 app.put("/users/:id/password", (req, res) => {
     const { ancienPassword, nouveauPassword } = req.body;
-
     db.query(
         "SELECT id FROM users WHERE id = ? AND password = ?",
         [req.params.id, ancienPassword],
@@ -129,7 +113,6 @@ app.put("/users/:id/password", (req, res) => {
             if (result.length === 0) {
                 return res.json({ success: false, message: "Ancien mot de passe incorrect" });
             }
-
             db.query(
                 "UPDATE users SET password = ? WHERE id = ?",
                 [nouveauPassword, req.params.id],
@@ -146,38 +129,27 @@ app.put("/users/:id/password", (req, res) => {
 //  DEMANDES — CÔTÉ CITOYEN
 // ══════════════════════════════════════════════════════
 
-// Créer une demande
 app.post("/demandes", (req, res) => {
     const { user_id, titre, description } = req.body;
-
     if (!user_id) return res.status(400).json({ message: "Utilisateur non identifié" });
     if (!titre)   return res.status(400).json({ message: "Type de demande requis" });
     if (!description) return res.status(400).json({ message: "Description requise" });
-
     db.query(
         "INSERT INTO demandes (user_id, titre, description, statut) VALUES (?, ?, ?, 'En attente')",
         [user_id, titre, description],
         (err, result) => {
             if (err) return res.status(500).json({ message: "Erreur lors de la création" });
-            res.json({
-                message    : "Demande soumise avec succès",
-                demandeId  : result.insertId
-            });
+            res.json({ message: "Demande soumise avec succès", demandeId: result.insertId });
         }
     );
 });
 
-// Récupérer les demandes d'un citoyen (avec commentaire admin)
 app.get("/demandes", (req, res) => {
     const { userId } = req.query;
     if (!userId) return res.status(400).json({ message: "userId manquant" });
-
     db.query(
-        `SELECT id, titre, description, statut, commentaire_admin,
-                created_at, updated_at
-         FROM demandes
-         WHERE user_id = ?
-         ORDER BY created_at DESC`,
+        `SELECT id, titre, description, statut, commentaire_admin, created_at, updated_at
+         FROM demandes WHERE user_id = ? ORDER BY created_at DESC`,
         [userId],
         (err, result) => {
             if (err) return res.status(500).json({ message: "Erreur serveur" });
@@ -186,107 +158,66 @@ app.get("/demandes", (req, res) => {
     );
 });
 
-// Modifier une demande — seulement si statut "En attente"
 app.put("/demandes/:id", (req, res) => {
     const { titre, description } = req.body;
-
-    // Vérifier le statut avant modification
-    db.query(
-        "SELECT statut FROM demandes WHERE id = ?",
-        [req.params.id],
-        (err, result) => {
-            if (err) return res.status(500).json({ message: "Erreur serveur" });
-            if (result.length === 0) return res.status(404).json({ message: "Demande introuvable" });
-
-            if (result[0].statut !== "En attente") {
-                return res.status(403).json({
-                    message: "Impossible de modifier : cette demande est déjà en cours de traitement"
-                });
-            }
-
-            db.query(
-                "UPDATE demandes SET titre = ?, description = ? WHERE id = ?",
-                [titre, description, req.params.id],
-                (err) => {
-                    if (err) return res.status(500).json({ message: "Erreur modification" });
-                    res.json({ message: "Demande modifiée avec succès" });
-                }
-            );
+    db.query("SELECT statut FROM demandes WHERE id = ?", [req.params.id], (err, result) => {
+        if (err) return res.status(500).json({ message: "Erreur serveur" });
+        if (result.length === 0) return res.status(404).json({ message: "Demande introuvable" });
+        if (result[0].statut !== "En attente") {
+            return res.status(403).json({ message: "Impossible de modifier : cette demande est déjà en cours de traitement" });
         }
-    );
+        db.query(
+            "UPDATE demandes SET titre = ?, description = ? WHERE id = ?",
+            [titre, description, req.params.id],
+            (err) => {
+                if (err) return res.status(500).json({ message: "Erreur modification" });
+                res.json({ message: "Demande modifiée avec succès" });
+            }
+        );
+    });
 });
 
-// Supprimer une demande — seulement si statut "En attente"
 app.delete("/demandes/:id", (req, res) => {
-    db.query(
-        "SELECT statut FROM demandes WHERE id = ?",
-        [req.params.id],
-        (err, result) => {
-            if (err) return res.status(500).json({ message: "Erreur serveur" });
-            if (result.length === 0) return res.status(404).json({ message: "Demande introuvable" });
-
-            if (result[0].statut !== "En attente") {
-                return res.status(403).json({
-                    message: "Impossible de supprimer : cette demande est en cours de traitement"
-                });
-            }
-
-            db.query("DELETE FROM demandes WHERE id = ?", [req.params.id], (err) => {
-                if (err) return res.status(500).json({ message: "Erreur suppression" });
-                res.json({ message: "Demande supprimée" });
-            });
+    db.query("SELECT statut FROM demandes WHERE id = ?", [req.params.id], (err, result) => {
+        if (err) return res.status(500).json({ message: "Erreur serveur" });
+        if (result.length === 0) return res.status(404).json({ message: "Demande introuvable" });
+        if (result[0].statut !== "En attente") {
+            return res.status(403).json({ message: "Impossible de supprimer : cette demande est en cours de traitement" });
         }
-    );
+        db.query("DELETE FROM demandes WHERE id = ?", [req.params.id], (err) => {
+            if (err) return res.status(500).json({ message: "Erreur suppression" });
+            res.json({ message: "Demande supprimée" });
+        });
+    });
 });
 
 // ══════════════════════════════════════════════════════
-//  ADMIN — Gestion de toutes les demandes
+//  ADMIN
 // ══════════════════════════════════════════════════════
 
-// Voir TOUTES les demandes avec nom du citoyen
 app.get("/admin/demandes", (req, res) => {
-    // Requête robuste — fonctionne même si commentaire_admin ou updated_at manquent
     const sql = `
-        SELECT
-            d.id,
-            d.titre,
-            d.description,
-            d.statut,
-            d.created_at,
-            COALESCE(d.commentaire_admin, '') AS commentaire_admin,
-            d.updated_at,
-            u.id   AS user_id,
-            u.nom  AS user_nom,
-            u.email AS user_email
+        SELECT d.id, d.titre, d.description, d.statut, d.created_at,
+               COALESCE(d.commentaire_admin, '') AS commentaire_admin,
+               d.updated_at, u.id AS user_id, u.nom AS user_nom, u.email AS user_email
         FROM demandes d
         JOIN users u ON d.user_id = u.id
-        ORDER BY
-            CASE d.statut
-                WHEN 'En attente' THEN 1
-                WHEN 'En cours'   THEN 2
-                WHEN 'Terminée'   THEN 3
-                WHEN 'Refusée'    THEN 4
-            END,
-            d.created_at DESC
-    `;
-
+        ORDER BY CASE d.statut
+            WHEN 'En attente' THEN 1
+            WHEN 'En cours'   THEN 2
+            WHEN 'Terminée'   THEN 3
+            WHEN 'Refusée'    THEN 4
+        END, d.created_at DESC`;
     db.query(sql, (err, result) => {
         if (err) {
             console.error("Erreur /admin/demandes :", err.message);
-
-            // Si la colonne n'existe pas encore → requête simplifiée
             if (err.code === 'ER_BAD_FIELD_ERROR') {
-                const sqlSimple = `
-                    SELECT
-                        d.id, d.titre, d.description, d.statut, d.created_at,
-                        '' AS commentaire_admin, NULL AS updated_at,
-                        u.id AS user_id, u.nom AS user_nom, u.email AS user_email
-                    FROM demandes d
-                    JOIN users u ON d.user_id = u.id
-                    ORDER BY d.created_at DESC
-                `;
+                const sqlSimple = `SELECT d.id, d.titre, d.description, d.statut, d.created_at,
+                    '' AS commentaire_admin, NULL AS updated_at,
+                    u.id AS user_id, u.nom AS user_nom, u.email AS user_email
+                    FROM demandes d JOIN users u ON d.user_id = u.id ORDER BY d.created_at DESC`;
                 return db.query(sqlSimple, (err2, result2) => {
-                    if (err2) return res.status(500).json({ message: "Erreur serveur", detail: err2.message });
+                    if (err2) return res.status(500).json({ message: "Erreur serveur" });
                     res.json(result2);
                 });
             }
@@ -296,32 +227,23 @@ app.get("/admin/demandes", (req, res) => {
     });
 });
 
-// Admin change statut ET écrit une réponse au citoyen
 app.put("/admin/demandes/:id/statut", (req, res) => {
     const { statut, commentaire_admin } = req.body;
-
     const statutsValides = ["En attente", "En cours", "Terminée", "Refusée"];
     if (!statutsValides.includes(statut)) {
         return res.status(400).json({ message: "Statut invalide" });
     }
-
-    // Essayer avec commentaire_admin d'abord
     db.query(
         "UPDATE demandes SET statut = ?, commentaire_admin = ? WHERE id = ?",
         [statut, commentaire_admin || null, req.params.id],
         (err) => {
             if (err && err.code === 'ER_BAD_FIELD_ERROR') {
-                // Colonne pas encore créée → update sans commentaire
-                db.query(
-                    "UPDATE demandes SET statut = ? WHERE id = ?",
-                    [statut, req.params.id],
-                    (err2) => {
-                        if (err2) return res.status(500).json({ message: "Erreur serveur" });
-                        res.json({ message: "Statut mis à jour (sans commentaire — colonne manquante)", needsMigration: true });
-                    }
-                );
+                db.query("UPDATE demandes SET statut = ? WHERE id = ?", [statut, req.params.id], (err2) => {
+                    if (err2) return res.status(500).json({ message: "Erreur serveur" });
+                    res.json({ message: "Statut mis à jour" });
+                });
             } else if (err) {
-                return res.status(500).json({ message: "Erreur serveur", detail: err.message });
+                return res.status(500).json({ message: "Erreur serveur" });
             } else {
                 res.json({ message: "Demande mise à jour avec succès" });
             }
@@ -329,7 +251,6 @@ app.put("/admin/demandes/:id/statut", (req, res) => {
     );
 });
 
-// Admin supprime n'importe quelle demande
 app.delete("/admin/demandes/:id", (req, res) => {
     db.query("DELETE FROM demandes WHERE id = ?", [req.params.id], (err) => {
         if (err) return res.status(500).json({ message: "Erreur suppression" });
@@ -337,11 +258,9 @@ app.delete("/admin/demandes/:id", (req, res) => {
     });
 });
 
-// Statistiques globales pour admin
 app.get("/admin/stats", (req, res) => {
     db.query(
-        `SELECT
-            COUNT(*) AS total,
+        `SELECT COUNT(*) AS total,
             SUM(statut = 'En attente') AS en_attente,
             SUM(statut = 'En cours')   AS en_cours,
             SUM(statut = 'Terminée')   AS terminees,
@@ -355,9 +274,7 @@ app.get("/admin/stats", (req, res) => {
     );
 });
 
-// ─── Route diagnostic ─────────────────────────────────
 app.get("/diagnostic", (req, res) => {
-    // Vérifier les colonnes de la table demandes
     db.query("DESCRIBE demandes", (err, cols) => {
         if (err) return res.status(500).json({ erreur: err.message });
         const colonnes = cols.map(c => c.Field);
@@ -368,7 +285,7 @@ app.get("/diagnostic", (req, res) => {
             has_updated_at: colonnes.includes("updated_at"),
             message: colonnes.includes("commentaire_admin")
                 ? "✅ Base de données à jour"
-                : "⚠️ Colonnes manquantes — exécutez le SQL de migration"
+                : "⚠️ Colonnes manquantes"
         });
     });
 });
@@ -377,16 +294,7 @@ app.get("/diagnostic", (req, res) => {
 app.listen(PORT, () => {
     console.log(`\n🚀 Serveur CommuneService démarré`);
     console.log(`📡 http://localhost:${PORT}`);
-    console.log(`\nRoutes disponibles :`);
-    console.log(`  POST   /register`);
-    console.log(`  POST   /login`);
-    console.log(`  GET    /demandes?userId=X`);
-    console.log(`  POST   /demandes`);
-    console.log(`  PUT    /demandes/:id`);
-    console.log(`  DELETE /demandes/:id`);
-    console.log(`  GET    /admin/demandes`);
-    console.log(`  PUT    /admin/demandes/:id/statut`);
-    console.log(`  GET    /admin/stats\n`);
+    console.log(`\nRoutes : /register /login /demandes /admin/demandes /admin/stats\n`);
 });
 
 module.exports = db;
