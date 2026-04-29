@@ -1,7 +1,7 @@
 # 🏛️ CommuneService — Système de Gestion des Demandes Administratives
 
 > Application web complète pour la gestion des demandes administratives d'une commune.
-> **Master 1 EII 2026 — Théogène Facrino — Antananarivo, Madagascar**
+> **Master 1 EII 2026 — Théogène Facrino —  Madagascar**
 
 ---
 
