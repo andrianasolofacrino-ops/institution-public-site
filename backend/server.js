@@ -6,6 +6,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// ✅ Railway injecte PORT automatiquement — NE PAS forcer 8080
 const PORT = process.env.PORT || 3000;
 
 let pool;
@@ -234,7 +235,9 @@ app.get("/admin/stats", async (req, res) => {
     } catch (err) { res.status(500).json({ message: "Erreur serveur" }); }
 });
 
-app.listen(PORT, () => {
+// ✅ FIX CRITIQUE : écouter sur 0.0.0.0 pour Railway
+app.listen(PORT, "0.0.0.0", () => {
     console.log(`\n🚀 Serveur CommuneService v5.0`);
-    console.log(`📡 Port: ${PORT}\n`);
+    console.log(`📡 Port: ${PORT}`);
+    console.log(`🌐 Écoute sur 0.0.0.0:${PORT}\n`);
 });
