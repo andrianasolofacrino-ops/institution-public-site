@@ -7,7 +7,7 @@
 const API = (window.location.hostname === "localhost" ||
              window.location.hostname === "127.0.0.1")
     ? "http://localhost:3000"
-    : "https://communeservice-backend.onrender.com";
+    : "https://institution-public-site-production.up.railway.app";
 
 const PAR_PAGE = 5;
 
