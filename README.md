@@ -12,7 +12,7 @@
 | 🚀 **Site en ligne** | https://institution-public-site.vercel.app |
 | ⚙️ **API Backend** | https://institution-public-site-production.up.railway.app |
 | 💻 **Code source** | https://github.com/Andrianasolofacrino-ops/institution-public-site |
-| 🎨 **Maquettes Figma** | (ajoute ton lien Figma ici) |
+| 🎨 **Maquettes Figma** | https://www.figma.com/site/fMjTb4fphi8lrW9jPFD9Nb/CommuneService-%E2%80%94-Maquettes-UI?node-id=0-1&t=9WKYacIWw1o7oriB-1 |
 
 ---
 
