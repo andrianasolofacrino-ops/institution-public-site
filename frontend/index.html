@@ -6,266 +6,487 @@
     <title>CommuneService — Portail Administratif</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Marianne:wght@400;500;700;800&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bleu:      #0B3D91;
+            --bleu-vif:  #1565C0;
+            --bleu-ciel: #E8F0FE;
+            --or:        #F4A800;
+            --texte:     #0D1B2A;
+            --gris:      #64748B;
+            --fond:      #F7F9FC;
+            --blanc:     #FFFFFF;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--fond); color:var(--texte); overflow-x:hidden; }
+
+        /* NAVBAR */
+        .navbar-gov {
+            background:var(--blanc);
+            border-bottom:3px solid var(--bleu);
+            padding:14px 0;
+            position:sticky; top:0; z-index:1000;
+            box-shadow:0 2px 16px rgba(11,61,145,.08);
+        }
+        .brand-gov { display:flex; align-items:center; gap:12px; text-decoration:none; }
+        .brand-logo {
+            width:42px; height:42px; background:var(--bleu); border-radius:10px;
+            display:flex; align-items:center; justify-content:center; color:#fff; font-size:20px;
+        }
+        .brand-name { display:block; font-size:17px; font-weight:800; color:var(--bleu); line-height:1; }
+        .brand-sub  { display:block; font-size:11px; font-weight:500; color:var(--gris); letter-spacing:.03em; }
+
+        .btn-gov {
+            background:var(--bleu); color:#fff !important; border:2px solid var(--bleu);
+            border-radius:8px; font-weight:700; padding:9px 20px; transition:all .2s;
+            text-decoration:none; display:inline-flex; align-items:center;
+        }
+        .btn-gov:hover { background:var(--bleu-vif); border-color:var(--bleu-vif); transform:translateY(-1px); box-shadow:0 4px 14px rgba(11,61,145,.3); }
+        .btn-outline-gov {
+            background:transparent; color:var(--bleu) !important; border:2px solid var(--bleu);
+            border-radius:8px; font-weight:700; padding:9px 20px; transition:all .2s;
+            text-decoration:none; display:inline-flex; align-items:center;
+        }
+        .btn-outline-gov:hover { background:var(--bleu-ciel); transform:translateY(-1px); }
+
+        /* HERO */
+        .hero {
+            background:linear-gradient(135deg,var(--bleu) 0%,#1A237E 60%,#0D47A1 100%);
+            color:#fff; padding:80px 0 60px; position:relative; overflow:hidden;
+        }
+        .hero::before {
+            content:''; position:absolute; inset:0;
+            background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");
+        }
+        .hero-badge {
+            display:inline-flex; align-items:center;
+            background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.3);
+            border-radius:50px; padding:6px 16px; font-size:13px; font-weight:600;
+            color:#fff; margin-bottom:24px;
+            -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px);
+        }
+        .hero-titre { font-size:clamp(2rem,5vw,3.2rem); font-weight:800; line-height:1.15; margin-bottom:20px; }
+        .hero-titre span { color:var(--or); font-family:'Lora',serif; font-style:italic; }
+        .hero-desc { font-size:17px; color:rgba(255,255,255,.85); line-height:1.7; max-width:500px; margin-bottom:36px; }
+
+        .hero-btns { display:flex; flex-wrap:wrap; gap:14px; margin-bottom:48px; }
+        .btn-hero-primary {
+            background:var(--or); color:var(--texte) !important; border:2px solid var(--or);
+            border-radius:10px; font-weight:800; font-size:16px; padding:14px 28px;
+            text-decoration:none; display:inline-flex; align-items:center; gap:8px;
+            transition:all .25s; box-shadow:0 4px 20px rgba(244,168,0,.4);
+        }
+        .btn-hero-primary:hover { background:#E69900; border-color:#E69900; transform:translateY(-2px); box-shadow:0 8px 28px rgba(244,168,0,.5); }
+        .btn-hero-secondary {
+            background:rgba(255,255,255,.12); color:#fff !important; border:2px solid rgba(255,255,255,.5);
+            border-radius:10px; font-weight:700; font-size:16px; padding:14px 28px;
+            text-decoration:none; display:inline-flex; align-items:center; gap:8px;
+            transition:all .25s;
+            -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px);
+        }
+        .btn-hero-secondary:hover { background:rgba(255,255,255,.22); border-color:rgba(255,255,255,.8); transform:translateY(-2px); }
+
+        .hero-stats { display:flex; gap:32px; flex-wrap:wrap; }
+        .hero-stat-num { display:block; font-size:28px; font-weight:800; color:var(--or); line-height:1; }
+        .hero-stat-lbl { display:block; font-size:12px; font-weight:500; color:rgba(255,255,255,.7); margin-top:2px; }
+
+        /* PREVIEW */
+        .hero-preview {
+            background:rgba(255,255,255,.12);
+            -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px);
+            border:1px solid rgba(255,255,255,.25); border-radius:20px;
+            padding:24px; box-shadow:0 20px 60px rgba(0,0,0,.25);
+        }
+        .preview-dots { display:flex; gap:6px; margin-bottom:20px; }
+        .pdot { width:10px; height:10px; border-radius:50%; }
+        .pdot-r { background:#FF5F57; }
+        .pdot-y { background:#FFBD2E; }
+        .pdot-g { background:#28CA41; }
+        .preview-stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
+        .pstat { border-radius:10px; padding:14px 10px; text-align:center; }
+        .pstat-bleu   { background:rgba(255,255,255,.2); }
+        .pstat-jaune  { background:rgba(244,168,0,.25); }
+        .pstat-vert   { background:rgba(27,138,90,.25); }
+        .pstat-num { display:block; font-size:22px; font-weight:800; color:#fff; }
+        .pstat-lbl { display:block; font-size:11px; color:rgba(255,255,255,.7); }
+        .prow {
+            display:flex; align-items:center; gap:10px;
+            background:rgba(255,255,255,.1); border-radius:8px; padding:10px 12px; margin-bottom:8px;
+        }
+        .prow-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+        .prow-dot-bleu  { background:#60A5FA; }
+        .prow-dot-vert  { background:#34D399; }
+        .prow-dot-ciel  { background:#93C5FD; }
+        .prow-lines { flex:1; }
+        .prow-line { height:6px; background:rgba(255,255,255,.3); border-radius:3px; margin-bottom:4px; }
+        .prow-line-long  { width:75%; }
+        .prow-line-short { width:45%; margin-bottom:0; }
+        .pbadge { font-size:10px; font-weight:700; padding:3px 9px; border-radius:20px; white-space:nowrap; }
+        .pbadge-attente { background:rgba(244,168,0,.3); color:#FFD966; }
+        .pbadge-termine { background:rgba(27,138,90,.3); color:#6EE7B7; }
+        .pbadge-cours   { background:rgba(255,255,255,.2); color:#BAE6FD; }
+
+        /* SERVICES */
+        .section-services { padding:80px 0; background:var(--blanc); }
+        .section-tag {
+            display:inline-block; background:var(--bleu-ciel); color:var(--bleu);
+            font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+            padding:5px 14px; border-radius:20px; margin-bottom:12px;
+        }
+        .section-titre { font-size:clamp(1.6rem,3vw,2.4rem); font-weight:800; color:var(--texte); margin-bottom:10px; }
+        .section-desc  { font-size:16px; color:var(--gris); }
+        .service-card {
+            background:var(--fond); border:1.5px solid #E2E8F0; border-radius:16px;
+            padding:28px 24px; transition:all .25s; height:100%;
+        }
+        .service-card:hover { border-color:var(--bleu); transform:translateY(-4px); box-shadow:0 12px 32px rgba(11,61,145,.12); }
+        .service-icone {
+            width:52px; height:52px; border-radius:12px;
+            display:flex; align-items:center; justify-content:center;
+            font-size:22px; margin-bottom:16px;
+        }
+        .si-bleu   { background:#EFF6FF; color:#1D4ED8; }
+        .si-teal   { background:#F0FDFA; color:#0F766E; }
+        .si-violet { background:#F5F3FF; color:#7C3AED; }
+        .si-vert   { background:#F0FDF4; color:#15803D; }
+        .si-orange { background:#FFF7ED; color:#C2410C; }
+        .si-rouge  { background:#FFF1F2; color:#BE123C; }
+        .service-titre { font-size:15px; font-weight:700; margin-bottom:6px; }
+        .service-texte { font-size:13px; color:var(--gris); line-height:1.6; }
+
+        /* ÉTAPES */
+        .section-etapes { padding:80px 0; background:var(--fond); }
+        .step-card {
+            background:var(--blanc); border:1.5px solid #E2E8F0; border-radius:16px;
+            padding:32px 24px; text-align:center; transition:all .25s; height:100%;
+        }
+        .step-card-featured { background:var(--bleu); border-color:var(--bleu); color:#fff; }
+        .step-card-featured .step-texte { color:rgba(255,255,255,.8); }
+        .step-num {
+            width:32px; height:32px; border-radius:50%;
+            background:var(--bleu-ciel); color:var(--bleu);
+            font-size:14px; font-weight:800;
+            display:flex; align-items:center; justify-content:center; margin:0 auto 20px;
+        }
+        .step-card-featured .step-num { background:rgba(255,255,255,.2); color:#fff; }
+        .step-icone {
+            width:60px; height:60px; border-radius:16px;
+            background:var(--bleu-ciel); color:var(--bleu);
+            display:flex; align-items:center; justify-content:center;
+            font-size:26px; margin:0 auto 16px;
+        }
+        .step-card-featured .step-icone { background:rgba(255,255,255,.2); color:#fff; }
+        .step-titre { font-size:16px; font-weight:700; margin-bottom:8px; }
+        .step-texte { font-size:13px; color:var(--gris); line-height:1.6; }
+
+        /* CTA */
+        .section-cta {
+            padding:70px 0;
+            background:linear-gradient(135deg,var(--bleu) 0%,#1A237E 100%);
+            color:#fff; text-align:center;
+        }
+        .cta-titre { font-size:clamp(1.5rem,3vw,2.2rem); font-weight:800; margin-bottom:12px; }
+        .cta-desc  { font-size:16px; color:rgba(255,255,255,.8); max-width:500px; margin:0 auto 36px; }
+        .cta-btns  { display:flex; flex-wrap:wrap; gap:14px; justify-content:center; }
+
+        /* FOOTER */
+        .footer-gov { background:#0D1B2A; color:rgba(255,255,255,.7); padding:32px 0; }
+        .footer-brand { font-size:15px; font-weight:700; color:#fff; margin-bottom:4px; }
+        .footer-desc  { font-size:13px; margin:0; }
+        .footer-link  { color:rgba(255,255,255,.6); text-decoration:none; font-size:14px; transition:color .2s; }
+        .footer-link:hover { color:#fff; }
+
+        /* ANIMATIONS */
+        @keyframes fadeUp {
+            from { opacity:0; transform:translateY(30px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+        .fade-up  { animation:fadeUp .7s ease both; }
+        .delay-1  { animation-delay:.1s; }
+        .delay-2  { animation-delay:.2s; }
+        .delay-3  { animation-delay:.3s; }
+        .delay-4  { animation-delay:.4s; }
+
+        /* RESPONSIVE */
+        @media (max-width:768px) {
+            .hero { padding:50px 0 40px; }
+            .hero-btns { flex-direction:column; }
+            .btn-hero-primary, .btn-hero-secondary { justify-content:center; }
+            .hero-stats { gap:20px; }
+            .cta-btns { flex-direction:column; align-items:center; }
+        }
+    </style>
 </head>
-<body class="page-accueil">
+<body>
 
-    <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-gov">
-        <div class="container">
-            <a class="navbar-brand brand-gov" href="index.html">
-                <div class="brand-logo">
-                    <i class="bi bi-building-fill"></i>
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-gov">
+    <div class="container">
+        <a class="navbar-brand brand-gov" href="index.html">
+            <div class="brand-logo"><i class="bi bi-building-fill"></i></div>
+            <div>
+                <span class="brand-name">CommuneService</span>
+                <span class="brand-sub">Portail Administratif</span>
+            </div>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navMain" aria-label="Menu" aria-expanded="false" aria-controls="navMain">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navMain">
+            <ul class="navbar-nav ms-auto align-items-center gap-2">
+                <li class="nav-item">
+                    <a class="nav-link" style="color:var(--bleu);font-weight:600" href="index.html">
+                        <i class="bi bi-house me-1"></i>Accueil
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn-outline-gov" href="login.html">
+                        <i class="bi bi-box-arrow-in-right me-1"></i>Connexion
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn-gov ms-1" href="register.html">
+                        <i class="bi bi-person-plus me-1"></i>Créer un compte
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <!-- Texte gauche -->
+            <div class="col-lg-6">
+                <div class="hero-badge fade-up">
+                    <i class="bi bi-shield-check-fill me-2"></i>
+                    Service public officiel — Commune de Madagascar
                 </div>
-                <div class="brand-text">
-                    <span class="brand-name">CommuneService</span>
-                    <span class="brand-sub">Portail Administratif</span>
+                <h1 class="hero-titre fade-up delay-1">
+                    Vos démarches<br>
+                    <span>administratives</span><br>
+                    en ligne
+                </h1>
+                <p class="hero-desc fade-up delay-2">
+                    Soumettez et suivez vos demandes administratives depuis chez vous.
+                    Plus besoin de files d'attente pour obtenir vos documents officiels.
+                </p>
+                <div class="hero-btns fade-up delay-3">
+                    <a href="register.html" class="btn-hero-primary">
+                        <i class="bi bi-person-plus-fill"></i>
+                        Commencer maintenant
+                    </a>
+                    <a href="login.html" class="btn-hero-secondary">
+                        <i class="bi bi-box-arrow-in-right"></i>
+                        Se connecter
+                    </a>
                 </div>
+                <div class="hero-stats fade-up delay-4">
+                    <div>
+                        <span class="hero-stat-num">6</span>
+                        <span class="hero-stat-lbl">Types de demandes</span>
+                    </div>
+                    <div>
+                        <span class="hero-stat-num">100%</span>
+                        <span class="hero-stat-lbl">En ligne</span>
+                    </div>
+                    <div>
+                        <span class="hero-stat-num">24/7</span>
+                        <span class="hero-stat-lbl">Disponible</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Preview droite -->
+            <div class="col-lg-6 d-none d-lg-block fade-up delay-2">
+                <div class="hero-preview">
+                    <div class="preview-dots">
+                        <div class="pdot pdot-r"></div>
+                        <div class="pdot pdot-y"></div>
+                        <div class="pdot pdot-g"></div>
+                    </div>
+                    <div class="preview-stats-row">
+                        <div class="pstat pstat-bleu">
+                            <span class="pstat-num">12</span>
+                            <span class="pstat-lbl">Total</span>
+                        </div>
+                        <div class="pstat pstat-jaune">
+                            <span class="pstat-num">5</span>
+                            <span class="pstat-lbl">En attente</span>
+                        </div>
+                        <div class="pstat pstat-vert">
+                            <span class="pstat-num">6</span>
+                            <span class="pstat-lbl">Terminées</span>
+                        </div>
+                    </div>
+                    <div class="prow">
+                        <div class="prow-dot prow-dot-bleu"></div>
+                        <div class="prow-lines">
+                            <div class="prow-line prow-line-long"></div>
+                            <div class="prow-line prow-line-short"></div>
+                        </div>
+                        <span class="pbadge pbadge-attente">En attente</span>
+                    </div>
+                    <div class="prow">
+                        <div class="prow-dot prow-dot-vert"></div>
+                        <div class="prow-lines">
+                            <div class="prow-line prow-line-long"></div>
+                            <div class="prow-line prow-line-short"></div>
+                        </div>
+                        <span class="pbadge pbadge-termine">Terminée</span>
+                    </div>
+                    <div class="prow">
+                        <div class="prow-dot prow-dot-ciel"></div>
+                        <div class="prow-lines">
+                            <div class="prow-line prow-line-long"></div>
+                            <div class="prow-line prow-line-short"></div>
+                        </div>
+                        <span class="pbadge pbadge-cours">En cours</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SERVICES -->
+<section class="section-services">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="section-tag">Nos services</span>
+            <h2 class="section-titre">Que pouvez-vous demander ?</h2>
+            <p class="section-desc">6 types de documents administratifs disponibles en ligne</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4 col-sm-6">
+                <div class="service-card">
+                    <div class="service-icone si-bleu"><i class="bi bi-house-heart-fill"></i></div>
+                    <h3 class="service-titre">Certificat de résidence</h3>
+                    <p class="service-texte">Attestation officielle de votre domicile actuel délivrée par la commune</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <div class="service-card">
+                    <div class="service-icone si-teal"><i class="bi bi-person-vcard-fill"></i></div>
+                    <h3 class="service-titre">Acte de naissance</h3>
+                    <p class="service-texte">Copie intégrale ou extrait de votre acte de naissance officiel</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <div class="service-card">
+                    <div class="service-icone si-violet"><i class="bi bi-heart-fill"></i></div>
+                    <h3 class="service-titre">Acte de mariage</h3>
+                    <p class="service-texte">Extrait ou copie intégrale de votre acte de mariage officiel</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <div class="service-card">
+                    <div class="service-icone si-vert"><i class="bi bi-check-circle-fill"></i></div>
+                    <h3 class="service-titre">Certificat de vie</h3>
+                    <p class="service-texte">Attestation prouvant que vous êtes en vie, requise pour certaines démarches</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <div class="service-card">
+                    <div class="service-icone si-orange"><i class="bi bi-file-earmark-check-fill"></i></div>
+                    <h3 class="service-titre">Légalisation</h3>
+                    <p class="service-texte">Légalisation et authentification de vos documents officiels</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <div class="service-card">
+                    <div class="service-icone si-rouge"><i class="bi bi-folder-fill"></i></div>
+                    <h3 class="service-titre">Autre demande</h3>
+                    <p class="service-texte">Toute autre demande administrative spécifique non listée ci-dessus</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ÉTAPES -->
+<section class="section-etapes">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="section-tag">Comment ça marche</span>
+            <h2 class="section-titre">Simple en 3 étapes</h2>
+            <p class="section-desc">Obtenez vos documents sans vous déplacer</p>
+        </div>
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4">
+                <div class="step-card">
+                    <div class="step-num">1</div>
+                    <div class="step-icone"><i class="bi bi-person-plus-fill"></i></div>
+                    <h3 class="step-titre">Créer un compte</h3>
+                    <p class="step-texte">Inscrivez-vous gratuitement avec votre nom, email et mot de passe en moins d'une minute</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="step-card step-card-featured">
+                    <div class="step-num">2</div>
+                    <div class="step-icone"><i class="bi bi-file-earmark-plus-fill"></i></div>
+                    <h3 class="step-titre">Soumettre une demande</h3>
+                    <p class="step-texte">Choisissez le type de document et décrivez votre besoin en quelques clics</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="step-card">
+                    <div class="step-num">3</div>
+                    <div class="step-icone"><i class="bi bi-clock-history"></i></div>
+                    <h3 class="step-titre">Suivre l'état</h3>
+                    <p class="step-texte">Consultez le statut de votre demande en temps réel et recevez la réponse de l'administration</p>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-5">
+            <a href="register.html" class="btn-hero-primary">
+                <i class="bi bi-arrow-right-circle-fill"></i>
+                Commencer maintenant — c'est gratuit
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="navMain">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navMain">
-                <ul class="navbar-nav ms-auto align-items-center gap-2">
-                    <li class="nav-item">
-                        <a class="nav-link nav-link-gov" href="index.html">
-                            <i class="bi bi-house me-1"></i>Accueil
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="btn btn-outline-gov me-2" href="login.html">
-                            <i class="bi bi-box-arrow-in-right me-1"></i>Connexion
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="btn btn-gov" href="register.html">
-                            <i class="bi bi-person-plus me-1"></i>Créer un compte
-                        </a>
-                    </li>
-                </ul>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="section-cta">
+    <div class="container">
+        <h2 class="cta-titre">Prêt à simplifier vos démarches ?</h2>
+        <p class="cta-desc">Rejoignez les citoyens qui gèrent leurs demandes administratives en ligne, depuis chez eux.</p>
+        <div class="cta-btns">
+            <a href="register.html" class="btn-hero-primary">
+                <i class="bi bi-person-plus-fill"></i>
+                Créer un compte gratuit
+            </a>
+            <a href="login.html" class="btn-hero-secondary">
+                <i class="bi bi-box-arrow-in-right"></i>
+                Se connecter
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer-gov">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6 mb-3 mb-md-0">
+                <div class="footer-brand">
+                    <i class="bi bi-building-fill me-2"></i>CommuneService — Portail Administratif
+                </div>
+                <p class="footer-desc">Service public numérique — République de Madagascar · 2026</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <a href="login.html" class="footer-link me-3">Connexion</a>
+                <a href="register.html" class="footer-link">Inscription</a>
             </div>
         </div>
-    </nav>
+    </div>
+</footer>
 
-    <!-- HERO -->
-    <section class="hero-section">
-        <div class="hero-bg-pattern"></div>
-        <div class="container">
-            <div class="row align-items-center min-vh-hero">
-                <div class="col-lg-6" data-aos="fade-right">
-                    <div class="hero-badge">
-                        <i class="bi bi-shield-check-fill me-2"></i>
-                        Service public officiel — Commune de Madagascar
-                    </div>
-                    <h1 class="hero-title">
-                        Vos démarches<br>
-                        <span class="hero-accent">administratives</span><br>
-                        en ligne
-                    </h1>
-                    <p class="hero-desc">
-                        Soumettez et suivez vos demandes administratives depuis chez vous. 
-                        Plus besoin de vous déplacer pour obtenir vos documents officiels.
-                    </p>
-                    <div class="hero-actions">
-                        <a href="register.html" class="btn btn-gov btn-lg">
-                            <i class="bi bi-person-plus-fill me-2"></i>
-                            Commencer maintenant
-                        </a>
-                        <a href="login.html" class="btn btn-outline-gov btn-lg ms-3">
-                            <i class="bi bi-box-arrow-in-right me-2"></i>
-                            Se connecter
-                        </a>
-                    </div>
-                    <div class="hero-stats">
-                        <div class="hero-stat">
-                            <span class="hero-stat-num">6</span>
-                            <span class="hero-stat-label">Types de demandes</span>
-                        </div>
-                        <div class="hero-stat-divider"></div>
-                        <div class="hero-stat">
-                            <span class="hero-stat-num">100%</span>
-                            <span class="hero-stat-label">En ligne</span>
-                        </div>
-                        <div class="hero-stat-divider"></div>
-                        <div class="hero-stat">
-                            <span class="hero-stat-num">24/7</span>
-                            <span class="hero-stat-label">Disponible</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6 d-none d-lg-flex justify-content-center">
-                    <div class="hero-card-preview">
-                        <div class="preview-card">
-                            <div class="preview-header">
-                                <div class="preview-dot red"></div>
-                                <div class="preview-dot yellow"></div>
-                                <div class="preview-dot green"></div>
-                            </div>
-                            <div class="preview-content">
-                                <div class="preview-stat-row">
-                                    <div class="preview-stat-box blue">
-                                        <span class="preview-num">12</span>
-                                        <span class="preview-lbl">Total</span>
-                                    </div>
-                                    <div class="preview-stat-box yellow">
-                                        <span class="preview-num">5</span>
-                                        <span class="preview-lbl">En attente</span>
-                                    </div>
-                                    <div class="preview-stat-box green">
-                                        <span class="preview-num">6</span>
-                                        <span class="preview-lbl">Terminées</span>
-                                    </div>
-                                </div>
-                                <div class="preview-item">
-                                    <div class="preview-item-dot blue"></div>
-                                    <div class="preview-item-text">
-                                        <div class="preview-line long"></div>
-                                        <div class="preview-line short"></div>
-                                    </div>
-                                    <div class="preview-badge yellow">En attente</div>
-                                </div>
-                                <div class="preview-item">
-                                    <div class="preview-item-dot green"></div>
-                                    <div class="preview-item-text">
-                                        <div class="preview-line long"></div>
-                                        <div class="preview-line short"></div>
-                                    </div>
-                                    <div class="preview-badge green">Terminée</div>
-                                </div>
-                                <div class="preview-item">
-                                    <div class="preview-item-dot blue"></div>
-                                    <div class="preview-item-text">
-                                        <div class="preview-line medium"></div>
-                                        <div class="preview-line short"></div>
-                                    </div>
-                                    <div class="preview-badge blue">En cours</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- SERVICES -->
-    <section class="services-section">
-        <div class="container">
-            <div class="section-header text-center">
-                <span class="section-tag">Nos services</span>
-                <h2 class="section-title">Que pouvez-vous demander ?</h2>
-                <p class="section-desc">6 types de documents administratifs disponibles en ligne</p>
-            </div>
-            <div class="row g-4">
-                <div class="col-md-4 col-sm-6">
-                    <div class="service-card">
-                        <div class="service-icon blue"><i class="bi bi-house-heart-fill"></i></div>
-                        <h3 class="service-title">Certificat de résidence</h3>
-                        <p class="service-desc">Attestation officielle de votre domicile actuel</p>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6">
-                    <div class="service-card">
-                        <div class="service-icon teal"><i class="bi bi-person-vcard-fill"></i></div>
-                        <h3 class="service-title">Acte de naissance</h3>
-                        <p class="service-desc">Copie intégrale ou extrait de votre acte de naissance</p>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6">
-                    <div class="service-card">
-                        <div class="service-icon purple"><i class="bi bi-heart-fill"></i></div>
-                        <h3 class="service-title">Acte de mariage</h3>
-                        <p class="service-desc">Extrait ou copie intégrale de l'acte de mariage</p>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6">
-                    <div class="service-card">
-                        <div class="service-icon green"><i class="bi bi-check-circle-fill"></i></div>
-                        <h3 class="service-title">Certificat de vie</h3>
-                        <p class="service-desc">Attestation prouvant que vous êtes en vie</p>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6">
-                    <div class="service-card">
-                        <div class="service-icon orange"><i class="bi bi-file-earmark-check-fill"></i></div>
-                        <h3 class="service-title">Légalisation</h3>
-                        <p class="service-desc">Légalisation de documents officiels</p>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6">
-                    <div class="service-card">
-                        <div class="service-icon red"><i class="bi bi-folder-fill"></i></div>
-                        <h3 class="service-title">Autre demande</h3>
-                        <p class="service-desc">Toute autre demande administrative spécifique</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ÉTAPES -->
-    <section class="steps-section">
-        <div class="container">
-            <div class="section-header text-center">
-                <span class="section-tag">Comment ça marche</span>
-                <h2 class="section-title">Simple en 3 étapes</h2>
-            </div>
-            <div class="row g-4 justify-content-center">
-                <div class="col-md-4">
-                    <div class="step-card">
-                        <div class="step-number">1</div>
-                        <div class="step-icon"><i class="bi bi-person-plus-fill"></i></div>
-                        <h3 class="step-title">Créer un compte</h3>
-                        <p class="step-desc">Inscrivez-vous avec votre nom, email et mot de passe</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="step-card step-card-featured">
-                        <div class="step-number">2</div>
-                        <div class="step-icon"><i class="bi bi-file-earmark-plus-fill"></i></div>
-                        <h3 class="step-title">Soumettre une demande</h3>
-                        <p class="step-desc">Choisissez le type de document et décrivez votre besoin</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="step-card">
-                        <div class="step-number">3</div>
-                        <div class="step-icon"><i class="bi bi-clock-history"></i></div>
-                        <h3 class="step-title">Suivre l'état</h3>
-                        <p class="step-desc">Consultez le statut de votre demande en temps réel</p>
-                    </div>
-                </div>
-            </div>
-            <div class="text-center mt-5">
-                <a href="register.html" class="btn btn-gov btn-lg">
-                    <i class="bi bi-arrow-right-circle-fill me-2"></i>
-                    Commencer maintenant — c'est gratuit
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- FOOTER -->
-    <footer class="footer-gov">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <div class="footer-brand">
-                        <i class="bi bi-building-fill me-2"></i>
-                        <strong>CommuneService</strong> — Portail Administratif
-                    </div>
-                    <p class="footer-desc">Service public numérique — République de Madagascar · 2026</p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <a href="login.html" class="footer-link me-3">Connexion</a>
-                    <a href="register.html" class="footer-link">Inscription</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
