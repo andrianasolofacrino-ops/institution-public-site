@@ -1,9 +1,8 @@
 // ═══════════════════════════════════════════════════════
-//  COMMUNESERVICE — script.js v3.0
-//  ✅ Fonctionne en LOCAL et en LIGNE (Render)
+//  COMMUNESERVICE — script.js v4.0
+//  ✅ Bouton Traiter admin corrigé
 // ═══════════════════════════════════════════════════════
 
-// ✅ URL API automatique — local ou Render
 const API = (window.location.hostname === "localhost" ||
              window.location.hostname === "127.0.0.1")
     ? "http://localhost:3000"
@@ -32,12 +31,10 @@ document.addEventListener("DOMContentLoaded", function () {
         window.location.href = "login.html";
         return;
     }
-
     if (page.includes("dashboard.html") && isAdmin) {
         window.location.href = "admin.html";
         return;
     }
-
     if (page.includes("admin.html") && !isAdmin) {
         afficherToast("Accès refusé — Réservé aux administrateurs", "danger");
         setTimeout(() => window.location.href = "dashboard.html", 2000);
@@ -123,11 +120,7 @@ function loginUser(event) {
             localStorage.setItem("nom",     data.nom);
             localStorage.setItem("email",   data.email);
             localStorage.setItem("isAdmin", data.isAdmin);
-            if (data.isAdmin) {
-                window.location.href = "admin.html";
-            } else {
-                window.location.href = "dashboard.html";
-            }
+            window.location.href = data.isAdmin ? "admin.html" : "dashboard.html";
         } else {
             afficherMessage("msgLogin", data.message || "Identifiants incorrects", "erreur");
         }
@@ -147,7 +140,7 @@ function logout() {
 }
 
 // ═══════════════════════════════════════════════════════
-//  DEMANDES — CITOYEN
+//  DEMANDES CITOYEN
 // ═══════════════════════════════════════════════════════
 function chargerDemandes() {
     const userId    = localStorage.getItem("userId");
@@ -163,10 +156,7 @@ function chargerDemandes() {
         </div>`;
 
     fetch(`${API}/demandes?userId=${userId}`)
-    .then(res => {
-        if (!res.ok) throw new Error("Erreur serveur " + res.status);
-        return res.json();
-    })
+    .then(res => { if (!res.ok) throw new Error(); return res.json(); })
     .then(data => {
         toutesLesDemandes = data;
         demandesFiltrees  = data;
@@ -177,9 +167,8 @@ function chargerDemandes() {
     .catch(() => {
         container.innerHTML = `
             <div class="erreur-connexion">
-                <i class="bi bi-exclamation-triangle-fill text-danger icone-erreur" aria-hidden="true"></i>
+                <i class="bi bi-exclamation-triangle-fill text-danger icone-erreur"></i>
                 <p class="mt-2"><strong>Impossible de contacter le serveur</strong></p>
-                <p class="text-muted">Vérifiez que le serveur est lancé.</p>
                 <button class="btn btn-gov mt-3" onclick="chargerDemandes()">
                     <i class="bi bi-arrow-clockwise me-1"></i>Réessayer
                 </button>
@@ -205,7 +194,7 @@ function afficherPage() {
             <div class="empty-state">
                 <div class="empty-state-icon"><i class="bi bi-folder2-open"></i></div>
                 <div class="empty-state-title">Aucune demande trouvée</div>
-                <div class="empty-state-desc">Vous n'avez pas encore soumis de demande administrative.</div>
+                <div class="empty-state-desc">Vous n'avez pas encore soumis de demande.</div>
                 <a href="demande.html" class="btn btn-gov mt-2">
                     <i class="bi bi-plus-circle-fill me-1"></i>Créer ma première demande
                 </a>
@@ -232,14 +221,12 @@ function afficherPage() {
             : "";
 
         const dateTraitement = d.updated_at
-            ? `<span class="ms-2">· Traité le ${formaterDate(d.updated_at)}</span>`
-            : "";
+            ? `<span class="ms-2">· Traité le ${formaterDate(d.updated_at)}</span>` : "";
 
         div.innerHTML = `
             <div class="demande-card-header">
                 <h3 class="demande-card-title">
-                    <i class="bi bi-file-earmark-text me-1"></i>
-                    ${echapper(d.titre)}
+                    <i class="bi bi-file-earmark-text me-1"></i>${echapper(d.titre)}
                 </h3>
                 <span class="badge-statut ${badgeClass(d.statut)}">${d.statut}</span>
             </div>
@@ -247,25 +234,22 @@ function afficherPage() {
             ${repAdmin}
             <p class="demande-card-meta">
                 <i class="bi bi-calendar3 me-1"></i>Déposée le ${formaterDate(d.created_at)}
-                ${dateTraitement}
-                &nbsp;·&nbsp;N° ${d.id}
+                ${dateTraitement} &nbsp;·&nbsp; N° ${d.id}
             </p>
             <div class="demande-card-actions">
                 <button class="btn-voir-dem" onclick="ouvrirDetail(${d.id})">
                     <i class="bi bi-eye-fill me-1"></i>Voir détail
                 </button>
                 ${peutModifier ? `
-                <button class="btn-modif-dem" onclick="ouvrirModification(${d.id}, '${echapperAttr(d.titre)}', '${echapperAttr(d.description)}')">
+                <button class="btn-modif-dem" onclick="ouvrirModificationCitoyen(${d.id})">
                     <i class="bi bi-pencil-fill me-1"></i>Modifier
                 </button>
                 <button class="btn-suppr-dem" onclick="supprimerDemande(${d.id})">
                     <i class="bi bi-trash3-fill me-1"></i>Supprimer
-                </button>
-                ` : `
+                </button>` : `
                 <span class="badge-statut-info">
                     <i class="bi bi-lock-fill me-1"></i>En cours de traitement
-                </span>
-                `}
+                </span>`}
                 <button class="btn-print-dem" onclick="imprimerDemandeDirecte(${d.id})">
                     <i class="bi bi-printer-fill me-1"></i>Imprimer
                 </button>
@@ -282,8 +266,7 @@ function filtrerDemandes() {
     const type   = document.getElementById("filtreType")?.value   || "";
 
     demandesFiltrees = toutesLesDemandes.filter(d => {
-        const matchSearch = d.titre.toLowerCase().includes(search) ||
-                            d.description.toLowerCase().includes(search);
+        const matchSearch = d.titre.toLowerCase().includes(search) || d.description.toLowerCase().includes(search);
         const matchStatut = !statut || d.statut === statut;
         const matchType   = !type   || d.titre  === type;
         return matchSearch && matchStatut && matchType;
@@ -294,11 +277,10 @@ function filtrerDemandes() {
 
 function resetFiltres() {
     ["searchInput","filtreStatut","filtreType"].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.value = "";
+        const el = document.getElementById(id); if (el) el.value = "";
     });
     demandesFiltrees = toutesLesDemandes;
-    pageActuelle     = 1;
+    pageActuelle = 1;
     afficherPage();
 }
 
@@ -340,21 +322,20 @@ function supprimerDemande(id) {
     .catch(() => afficherToast("Erreur lors de la suppression", "danger"));
 }
 
-function ouvrirModification(id, titre, description) {
+// ✅ Modification citoyen — utilise index au lieu d'attributs onclick
+function ouvrirModificationCitoyen(id) {
+    const d = toutesLesDemandes.find(dem => dem.id === id);
+    if (!d) return;
     document.getElementById("modifId").value          = id;
-    document.getElementById("modifTitre").value       = titre;
-    document.getElementById("modifDescription").value = description;
+    document.getElementById("modifTitre").value       = d.titre;
+    document.getElementById("modifDescription").value = d.description;
     const modal = document.getElementById("modaleModif");
-    if (typeof bootstrap !== "undefined" && modal) {
-        new bootstrap.Modal(modal).show();
-    }
+    if (typeof bootstrap !== "undefined" && modal) new bootstrap.Modal(modal).show();
 }
 
 function fermerModification() {
     const modal = document.getElementById("modaleModif");
-    if (typeof bootstrap !== "undefined" && modal) {
-        bootstrap.Modal.getInstance(modal)?.hide();
-    }
+    if (typeof bootstrap !== "undefined" && modal) bootstrap.Modal.getInstance(modal)?.hide();
 }
 
 function sauvegarderModification(event) {
@@ -375,8 +356,8 @@ function sauvegarderModification(event) {
         } else {
             const idx  = toutesLesDemandes.findIndex(d => d.id == id);
             const idx2 = demandesFiltrees.findIndex(d => d.id == id);
-            if (idx  !== -1) { toutesLesDemandes[idx].titre  = titre; toutesLesDemandes[idx].description = description; }
-            if (idx2 !== -1) { demandesFiltrees[idx2].titre  = titre; demandesFiltrees[idx2].description = description; }
+            if (idx  !== -1) { toutesLesDemandes[idx].titre = titre; toutesLesDemandes[idx].description = description; }
+            if (idx2 !== -1) { demandesFiltrees[idx2].titre = titre; demandesFiltrees[idx2].description = description; }
             fermerModification();
             afficherPage();
             afficherToast("Demande modifiée avec succès", "success");
@@ -403,16 +384,12 @@ function ouvrirDetail(id) {
             ${repAdmin}
         </table>`;
     const modal = document.getElementById("modaleDetail");
-    if (typeof bootstrap !== "undefined" && modal) {
-        new bootstrap.Modal(modal).show();
-    }
+    if (typeof bootstrap !== "undefined" && modal) new bootstrap.Modal(modal).show();
 }
 
 function fermerDetail() {
     const modal = document.getElementById("modaleDetail");
-    if (typeof bootstrap !== "undefined" && modal) {
-        bootstrap.Modal.getInstance(modal)?.hide();
-    }
+    if (typeof bootstrap !== "undefined" && modal) bootstrap.Modal.getInstance(modal)?.hide();
 }
 
 function imprimerDemande() {
@@ -420,12 +397,11 @@ function imprimerDemande() {
 }
 
 function imprimerDemandeDirecte(id) {
-    const d   = toutesLesDemandes.find(dem => dem.id === id);
+    const d = toutesLesDemandes.find(dem => dem.id === id);
     if (!d) return;
-    const nom = localStorage.getItem("nom") || "Citoyen";
+    const nom     = localStorage.getItem("nom") || "Citoyen";
     const reponse = d.commentaire_admin
-        ? `<div class="reponse"><strong>Réponse de l'administration :</strong><br>${d.commentaire_admin}</div>`
-        : "";
+        ? `<div class="reponse"><strong>Réponse de l'administration :</strong><br>${d.commentaire_admin}</div>` : "";
     const contenu = `<html><head><title>Demande #${d.id}</title>
         <style>body{font-family:Arial,sans-serif;margin:40px;color:#333}
         .entete{display:flex;align-items:center;border-bottom:3px solid #003189;padding-bottom:16px;margin-bottom:24px}
@@ -580,7 +556,7 @@ function chargerToutesLesDemandes() {
     .catch(() => {
         const tbody = document.getElementById("adminTableBody");
         if (tbody) tbody.innerHTML = `
-            <tr><td colspan="8" class="text-center p-4 text-danger">
+            <tr><td colspan="8" style="text-align:center;padding:32px;color:#DC2626">
                 ❌ Impossible de charger les demandes.
             </td></tr>`;
     });
@@ -600,8 +576,8 @@ function chargerStatsAdmin() {
 }
 
 function filtrerAdmin() {
-    const search = (document.getElementById("adminSearch")?.value || "").toLowerCase();
-    const statut = document.getElementById("adminFiltreStatut")?.value || "";
+    const search  = (document.getElementById("adminSearch")?.value || "").toLowerCase();
+    const statut  = document.getElementById("adminFiltreStatut")?.value || "";
     const filtrees = toutesDemandesAdmin.filter(d => {
         const matchSearch = d.titre.toLowerCase().includes(search) ||
                             (d.user_nom || "").toLowerCase().includes(search);
@@ -611,39 +587,42 @@ function filtrerAdmin() {
     afficherTableAdmin(filtrees);
 }
 
+// ✅ FONCTION CORRIGÉE — plus d'apostrophes dans onclick
 function afficherTableAdmin(demandes) {
     const tbody = document.getElementById("adminTableBody");
     if (!tbody) return;
+
     if (demandes.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center p-4 text-muted">Aucune demande trouvée</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:32px;color:#94A3B8">
+            Aucune demande trouvée</td></tr>`;
         return;
     }
+
+    // Stocker les demandes dans un index global pour éviter les problèmes d'apostrophes
+    window._adminIndex = {};
+    demandes.forEach(d => { window._adminIndex[d.id] = d; });
+
     tbody.innerHTML = demandes.map(d => `
         <tr>
             <td><strong>#${d.id}</strong></td>
             <td>
-                <div class="admin-citoyen-info">
-                    <span class="admin-citoyen-nom">${echapper(d.user_nom || "—")}</span>
-                    <span class="admin-citoyen-email">${echapper(d.user_email || "")}</span>
-                </div>
+                <div class="citoyen-nom">${echapper(d.user_nom || "—")}</div>
+                <div class="citoyen-email">${echapper(d.user_email || "")}</div>
             </td>
             <td>${echapper(d.titre)}</td>
             <td class="td-desc" title="${echapperAttr(d.description)}">${echapper(d.description)}</td>
             <td><span class="badge-statut ${badgeClass(d.statut)}">${d.statut}</span></td>
             <td>${d.commentaire_admin
-                ? `<span class="reponse-admin-cell">${echapper(d.commentaire_admin.substring(0,40))}${d.commentaire_admin.length > 40 ? '...' : ''}</span>`
-                : '<span class="pas-de-reponse">Pas encore</span>'
+                ? `<span class="rep-admin">${echapper(d.commentaire_admin.substring(0,40))}${d.commentaire_admin.length > 40 ? '...' : ''}</span>`
+                : '<span class="pas-encore">Pas encore</span>'
             }</td>
+            <td>${formaterDate(d.created_at)}</td>
             <td>
-                <div>${formaterDate(d.created_at)}</div>
-                ${d.updated_at ? `<div class="admin-date-traitement">Traité ${formaterDate(d.updated_at)}</div>` : ""}
-            </td>
-            <td>
-                <div class="admin-actions">
-                    <button class="btn-admin-traiter" onclick="ouvrirChangementStatut(${d.id}, '${echapperAttr(d.titre)}', '${d.statut}', '${echapperAttr(d.commentaire_admin || "")}', '${echapperAttr(d.description || "")}', '${echapperAttr(d.user_nom || "")}')">
-                        <i class="bi bi-pencil-fill me-1"></i>Traiter
+                <div style="display:flex;gap:6px">
+                    <button class="btn-traiter" onclick="ouvrirTraitement(${d.id})">
+                        <i class="bi bi-pencil-fill"></i> Traiter
                     </button>
-                    <button class="btn-admin-suppr" onclick="supprimerAdmin(${d.id})">
+                    <button class="btn-supprimer" onclick="supprimerAdmin(${d.id})">
                         <i class="bi bi-trash3-fill"></i>
                     </button>
                 </div>
@@ -655,26 +634,27 @@ function afficherTableAdmin(demandes) {
     }
 }
 
-function ouvrirChangementStatut(id, titre, statutActuel, commentaireActuel, description, userNom) {
+// ✅ NOUVELLE FONCTION — ouvre la modale via l'index (pas d'apostrophes)
+function ouvrirTraitement(id) {
+    const d = window._adminIndex && window._adminIndex[id];
+    if (!d) { afficherToast("Demande introuvable", "danger"); return; }
+
     document.getElementById("statutDemandeId").value  = id;
-    document.getElementById("nouveauStatut").value    = statutActuel;
-    document.getElementById("commentaireAdmin").value = commentaireActuel || "";
+    document.getElementById("nouveauStatut").value    = d.statut;
+    document.getElementById("commentaireAdmin").value = d.commentaire_admin || "";
+
     const titrEl = document.getElementById("statutDemandeTitre");
     const descEl = document.getElementById("statutDemandeDesc");
     const citEl  = document.getElementById("statutDemandeCitoyen");
-    if (titrEl) titrEl.textContent = titre || "";
-    if (descEl) descEl.textContent = description || "";
-    if (citEl)  citEl.textContent  = userNom ? "Citoyen : " + userNom : "";
+    if (titrEl) titrEl.textContent = d.titre || "";
+    if (descEl) descEl.textContent = d.description || "";
+    if (citEl)  citEl.textContent  = d.user_nom
+        ? "Citoyen : " + d.user_nom + " (" + (d.user_email || "") + ")"
+        : "";
+
     const modal = document.getElementById("modaleStatut");
     if (typeof bootstrap !== "undefined" && modal) {
         new bootstrap.Modal(modal).show();
-    }
-}
-
-function fermerStatut() {
-    const modal = document.getElementById("modaleStatut");
-    if (typeof bootstrap !== "undefined" && modal) {
-        bootstrap.Modal.getInstance(modal)?.hide();
     }
 }
 
@@ -682,6 +662,7 @@ function sauvegarderStatut() {
     const id               = document.getElementById("statutDemandeId").value;
     const statut           = document.getElementById("nouveauStatut").value;
     const commentaireAdmin = document.getElementById("commentaireAdmin").value.trim();
+
     fetch(`${API}/admin/demandes/${id}/statut`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -689,24 +670,34 @@ function sauvegarderStatut() {
     })
     .then(res => res.json())
     .then(() => {
+        // Mettre à jour les deux tableaux
         const idx = toutesDemandesAdmin.findIndex(d => d.id == id);
         if (idx !== -1) {
             toutesDemandesAdmin[idx].statut            = statut;
             toutesDemandesAdmin[idx].commentaire_admin = commentaireAdmin;
         }
-        fermerStatut();
+        if (window._adminIndex && window._adminIndex[id]) {
+            window._adminIndex[id].statut            = statut;
+            window._adminIndex[id].commentaire_admin = commentaireAdmin;
+        }
+        // Fermer la modale
+        const modal = document.getElementById("modaleStatut");
+        if (typeof bootstrap !== "undefined" && modal) {
+            bootstrap.Modal.getInstance(modal)?.hide();
+        }
         chargerStatsAdmin();
         filtrerAdmin();
-        afficherToast(`Demande #${id} mise à jour — ${statut}`, "success");
+        afficherToast("Demande #" + id + " mise à jour — " + statut, "success");
     })
     .catch(() => afficherToast("Erreur lors de la mise à jour", "danger"));
 }
 
 function supprimerAdmin(id) {
-    if (!confirm(`Supprimer la demande #${id} ?`)) return;
+    if (!confirm("Supprimer la demande #" + id + " ?")) return;
     fetch(`${API}/admin/demandes/${id}`, { method: "DELETE" })
     .then(() => {
         toutesDemandesAdmin = toutesDemandesAdmin.filter(d => d.id != id);
+        if (window._adminIndex) delete window._adminIndex[id];
         chargerStatsAdmin();
         filtrerAdmin();
         afficherToast("Demande supprimée", "success");
@@ -739,7 +730,7 @@ function toggleUserMenu() {
 }
 
 document.addEventListener("click", function(e) {
-    const zone = document.querySelector(".topbar-user");
+    const zone = document.querySelector(".user-menu-wrap, .topbar-user");
     const menu = document.getElementById("userMenu");
     if (menu && zone && !zone.contains(e.target)) {
         menu.classList.remove("open");
@@ -751,10 +742,10 @@ function togglePassword(fieldId, btn) {
     if (!field) return;
     if (field.type === "password") {
         field.type = "text";
-        btn.innerHTML = '<i class="bi bi-eye-slash-fill" aria-hidden="true"></i>';
+        btn.innerHTML = '<i class="bi bi-eye-slash-fill"></i>';
     } else {
         field.type = "password";
-        btn.innerHTML = '<i class="bi bi-eye-fill" aria-hidden="true"></i>';
+        btn.innerHTML = '<i class="bi bi-eye-fill"></i>';
     }
 }
 
@@ -774,7 +765,7 @@ function afficherToast(message, type = "success") {
     toast.innerHTML = `
         <div class="d-flex">
             <div class="toast-body"><i class="bi ${icones[type] || icones.info} me-2"></i>${message}</div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Fermer"></button>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
         </div>`;
     container.appendChild(toast);
     if (typeof bootstrap !== "undefined") {
@@ -809,7 +800,12 @@ function formaterDate(dateStr) {
 }
 
 function badgeClass(statut) {
-    const map = { "En attente":"badge-attente", "En cours":"badge-encours", "Terminée":"badge-termine", "Refusée":"badge-refuse" };
+    const map = {
+        "En attente": "badge-attente",
+        "En cours":   "badge-encours",
+        "Terminée":   "badge-termine",
+        "Refusée":    "badge-refuse"
+    };
     return map[statut] || "badge-attente";
 }
 

@@ -6,379 +6,581 @@
     <title>Administration — CommuneService</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Marianne:wght@400;500;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="style.css">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #F1F5F9; }
+
+        /* TOPBAR */
+        .topbar {
+            position: sticky; top: 0; z-index: 100;
+            background: #0B3D91; color: #fff;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 24px; height: 56px;
+            box-shadow: 0 2px 12px rgba(0,0,0,.2);
+        }
+        .topbar-brand { display: flex; align-items: center; gap: 12px; }
+        .topbar-logo {
+            display: flex; align-items: center; gap: 8px;
+            color: #fff; text-decoration: none; font-weight: 700; font-size: 16px;
+        }
+        .admin-badge {
+            background: #F4A800; color: #0D1B2A;
+            font-size: 10px; font-weight: 800;
+            padding: 2px 8px; border-radius: 4px; letter-spacing: .05em;
+        }
+        .topbar-actions { display: flex; align-items: center; gap: 12px; }
+        .btn-topbar {
+            background: rgba(255,255,255,.15); color: #fff;
+            border: 1px solid rgba(255,255,255,.3); border-radius: 6px;
+            padding: 6px 14px; font-size: 13px; font-weight: 600;
+            text-decoration: none; display: flex; align-items: center; gap: 6px;
+            transition: all .2s; cursor: pointer;
+        }
+        .btn-topbar:hover { background: rgba(255,255,255,.25); color: #fff; }
+        .user-avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: #F4A800; color: #0D1B2A;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 14px; cursor: pointer;
+        }
+        .user-name { color: #fff; font-size: 13px; font-weight: 600; }
+        .user-menu-wrap { position: relative; }
+        .user-menu {
+            position: absolute; top: 44px; right: 0;
+            background: #fff; border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0,0,0,.15);
+            min-width: 180px; padding: 8px 0;
+            display: none; z-index: 200;
+        }
+        .user-menu.open { display: block; }
+        .user-menu-item {
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 16px; color: #374151; font-size: 14px;
+            text-decoration: none; transition: background .15s;
+            background: none; border: none; width: 100%; cursor: pointer;
+        }
+        .user-menu-item:hover { background: #F3F4F6; }
+        .user-menu-logout { color: #DC2626; }
+        .user-menu-divider { height: 1px; background: #E5E7EB; margin: 4px 0; }
+
+        /* LAYOUT */
+        .app-layout { display: flex; min-height: calc(100vh - 56px); }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 220px; flex-shrink: 0;
+            background: #fff; border-right: 1px solid #E2E8F0;
+            padding: 20px 0; position: sticky; top: 56px;
+            height: calc(100vh - 56px); overflow-y: auto;
+        }
+        .sidebar-section { font-size: 10px; font-weight: 700; color: #94A3B8;
+            text-transform: uppercase; letter-spacing: .08em;
+            padding: 0 16px; margin: 16px 0 6px; }
+        .sidebar-link {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 16px; color: #475569; font-size: 14px; font-weight: 500;
+            text-decoration: none; border-radius: 8px; margin: 2px 8px;
+            transition: all .15s; background: none; border: none; width: calc(100% - 16px); cursor: pointer;
+        }
+        .sidebar-link:hover { background: #F1F5F9; color: #0B3D91; }
+        .sidebar-link.active { background: #EFF6FF; color: #0B3D91; font-weight: 700; }
+        .sidebar-logout { color: #DC2626; }
+        .sidebar-logout:hover { background: #FEF2F2; color: #B91C1C; }
+
+        /* MAIN */
+        .app-main { flex: 1; padding: 28px; overflow-x: auto; }
+
+        /* PAGE HEADER */
+        .page-header {
+            display: flex; align-items: flex-start; justify-content: space-between;
+            flex-wrap: wrap; gap: 12px; margin-bottom: 28px;
+        }
+        .page-title { font-size: 26px; font-weight: 800; color: #0D1B2A; margin: 0; }
+        .page-subtitle { font-size: 14px; color: #64748B; margin: 4px 0 0; }
+        .btn-export {
+            background: #059669; color: #fff; border: none; border-radius: 8px;
+            padding: 10px 20px; font-weight: 700; font-size: 14px;
+            display: flex; align-items: center; gap: 6px; cursor: pointer;
+            transition: all .2s;
+        }
+        .btn-export:hover { background: #047857; transform: translateY(-1px); }
+        .admin-header-badge {
+            background: #EFF6FF; color: #0B3D91; border: 1px solid #BFDBFE;
+            border-radius: 6px; padding: 8px 14px; font-size: 13px; font-weight: 700;
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        /* STAT CARDS */
+        .stat-card {
+            background: #fff; border-radius: 14px; padding: 20px;
+            border: 1px solid #E2E8F0; display: flex; align-items: center; gap: 16px;
+            transition: all .2s;
+        }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.08); }
+        .stat-icon {
+            width: 48px; height: 48px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+        }
+        .si-blue   { background: #EFF6FF; color: #1D4ED8; }
+        .si-yellow { background: #FFFBEB; color: #D97706; }
+        .si-cyan   { background: #ECFEFF; color: #0891B2; }
+        .si-green  { background: #F0FDF4; color: #15803D; }
+        .stat-num  { font-size: 28px; font-weight: 800; color: #0D1B2A; line-height: 1; }
+        .stat-lbl  { font-size: 12px; color: #64748B; margin-top: 2px; }
+
+        /* CHARTS */
+        .chart-card {
+            background: #fff; border-radius: 14px; border: 1px solid #E2E8F0; overflow: hidden;
+        }
+        .chart-header {
+            padding: 16px 20px; font-size: 14px; font-weight: 700; color: #0D1B2A;
+            border-bottom: 1px solid #F1F5F9; display: flex; align-items: center; gap: 8px;
+        }
+        .chart-body { padding: 16px 20px; }
+
+        /* FILTRES */
+        .filtres-bar {
+            background: #fff; border-radius: 14px; border: 1px solid #E2E8F0;
+            padding: 16px 20px; margin-bottom: 16px;
+            display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+        }
+        .filtres-titre { font-size: 16px; font-weight: 700; color: #0D1B2A; }
+        .filtres-right { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .select-filtre {
+            border: 1.5px solid #E2E8F0; border-radius: 8px; padding: 8px 14px;
+            font-size: 13px; font-weight: 500; background: #fff; color: #374151; cursor: pointer;
+        }
+        .search-box {
+            position: relative; display: flex; align-items: center;
+        }
+        .search-icon { position: absolute; left: 10px; color: #94A3B8; font-size: 14px; }
+        .search-input {
+            border: 1.5px solid #E2E8F0; border-radius: 8px;
+            padding: 8px 14px 8px 32px; font-size: 13px; width: 220px;
+        }
+        .search-input:focus { outline: none; border-color: #0B3D91; }
+
+        /* TABLE */
+        .table-card {
+            background: #fff; border-radius: 14px; border: 1px solid #E2E8F0; overflow: hidden;
+        }
+        .admin-table { width: 100%; border-collapse: collapse; }
+        .admin-table thead { background: #0B3D91; }
+        .admin-table thead th {
+            color: #fff; font-size: 12px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: .05em; padding: 14px 16px; white-space: nowrap;
+        }
+        .admin-table tbody tr { border-bottom: 1px solid #F1F5F9; transition: background .15s; }
+        .admin-table tbody tr:hover { background: #F8FAFC; }
+        .admin-table tbody td { padding: 14px 16px; font-size: 13px; color: #374151; vertical-align: middle; }
+        .citoyen-nom   { font-weight: 700; color: #0D1B2A; }
+        .citoyen-email { font-size: 11px; color: #94A3B8; }
+        .td-desc { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .rep-admin { font-size: 12px; color: #0B3D91; font-style: italic; }
+        .pas-encore { font-size: 12px; color: #94A3B8; font-style: italic; }
+
+        /* BADGES */
+        .badge-statut {
+            padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap;
+        }
+        .badge-attente { background: #FFFBEB; color: #D97706; border: 1px solid #FDE68A; }
+        .badge-encours { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+        .badge-termine { background: #F0FDF4; color: #15803D; border: 1px solid #BBF7D0; }
+        .badge-refuse  { background: #FFF1F2; color: #BE123C; border: 1px solid #FECDD3; }
+
+        /* ACTIONS */
+        .btn-traiter {
+            background: #0B3D91; color: #fff; border: none; border-radius: 6px;
+            padding: 6px 14px; font-size: 12px; font-weight: 700;
+            cursor: pointer; transition: all .15s; display: inline-flex; align-items: center; gap: 4px;
+        }
+        .btn-traiter:hover { background: #1565C0; transform: translateY(-1px); }
+        .btn-supprimer {
+            background: #FFF1F2; color: #BE123C; border: 1px solid #FECDD3; border-radius: 6px;
+            padding: 6px 10px; font-size: 12px; cursor: pointer; transition: all .15s;
+        }
+        .btn-supprimer:hover { background: #FEE2E2; }
+
+        /* MODALE */
+        .modal-gov .modal-content { border-radius: 16px; border: none; overflow: hidden; }
+        .modal-gov .modal-header { background: #0B3D91; color: #fff; padding: 18px 24px; }
+        .modal-gov .modal-title { font-weight: 700; font-size: 16px; }
+        .modal-gov .btn-close { filter: brightness(0) invert(1); }
+        .modal-gov .modal-body { padding: 24px; }
+        .modal-gov .modal-footer { padding: 16px 24px; border-top: 1px solid #F1F5F9; }
+        .demande-info-box {
+            background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px;
+            padding: 16px; margin-bottom: 20px;
+        }
+        .demande-info-label { font-size: 11px; font-weight: 700; color: #94A3B8;
+            text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+        .demande-info-titre { font-size: 16px; font-weight: 700; color: #0D1B2A; }
+        .demande-info-desc  { font-size: 13px; color: #64748B; margin-top: 4px; }
+        .demande-info-citoyen { font-size: 12px; color: #0B3D91; font-weight: 600; margin-top: 6px; }
+        .form-label-gov { font-size: 13px; font-weight: 700; color: #374151; margin-bottom: 6px; display: block; }
+        .form-control-gov {
+            border: 1.5px solid #E2E8F0; border-radius: 8px; padding: 10px 14px;
+            font-size: 14px; width: 100%; transition: border-color .2s;
+        }
+        .form-control-gov:focus { outline: none; border-color: #0B3D91; box-shadow: 0 0 0 3px rgba(11,61,145,.1); }
+        .form-hint { font-size: 11px; color: #94A3B8; }
+        .btn-confirmer {
+            background: #0B3D91; color: #fff; border: none; border-radius: 8px;
+            padding: 10px 24px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all .2s;
+        }
+        .btn-confirmer:hover { background: #1565C0; }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .app-main { padding: 16px; }
+            .filtres-bar { flex-direction: column; align-items: stretch; }
+            .filtres-right { flex-direction: column; }
+            .search-input { width: 100%; }
+        }
+    </style>
 </head>
-<body class="page-app">
+<body>
 
-    <header class="topbar topbar-admin">
-        <div class="topbar-brand">
-            <button class="sidebar-toggle sidebar-toggle-light" onclick="toggleSidebar()" aria-label="Ouvrir le menu" title="Menu">
-                <i class="bi bi-list" aria-hidden="true"></i>
-            </button>
-            <a href="index.html" class="topbar-logo topbar-logo-light">
-                <i class="bi bi-building-fill me-2" aria-hidden="true"></i>
-                <span>CommuneService</span>
-                <span class="admin-badge ms-2">ADMIN</span>
-            </a>
-        </div>
-        <div class="topbar-actions">
-            <a href="dashboard.html" class="btn btn-outline-light btn-sm me-2">
-                <i class="bi bi-grid-fill me-1" aria-hidden="true"></i>Mon espace
-            </a>
-            <div class="topbar-user topbar-user-light" onclick="toggleUserMenu()">
-                <div class="user-avatar user-avatar-dark" id="topbarAvatar" aria-hidden="true">?</div>
-                <span class="user-name-light d-none d-md-inline" id="nomUtilisateur">...</span>
-                <i class="bi bi-chevron-down ms-1 chevron-user" aria-hidden="true"></i>
-                <div class="user-menu" id="userMenu">
-                    <a href="profil.html" class="user-menu-item">
-                        <i class="bi bi-person-circle" aria-hidden="true"></i>Mon profil
-                    </a>
-                    <div class="user-menu-divider"></div>
-                    <button onclick="logout()" class="user-menu-item user-menu-logout" aria-label="Se déconnecter" title="Se déconnecter">
-                        <i class="bi bi-box-arrow-right" aria-hidden="true"></i>Se déconnecter
-                    </button>
-                </div>
+<!-- TOPBAR -->
+<header class="topbar">
+    <div class="topbar-brand">
+        <a href="index.html" class="topbar-logo">
+            <i class="bi bi-building-fill"></i>
+            <span>CommuneService</span>
+            <span class="admin-badge">ADMIN</span>
+        </a>
+    </div>
+    <div class="topbar-actions">
+        <a href="dashboard.html" class="btn-topbar">
+            <i class="bi bi-grid-fill"></i>Mon espace
+        </a>
+        <div class="user-menu-wrap">
+            <div style="display:flex;align-items:center;gap:8px;cursor:pointer" onclick="toggleUserMenu()">
+                <div class="user-avatar" id="topbarAvatar">?</div>
+                <span class="user-name d-none d-md-inline" id="nomUtilisateur">...</span>
+                <i class="bi bi-chevron-down" style="color:#fff;font-size:12px"></i>
             </div>
-        </div>
-    </header>
-
-    <div class="app-layout">
-        <aside class="sidebar sidebar-admin" id="sidebar">
-            <nav class="sidebar-nav" aria-label="Navigation admin">
-                <div class="sidebar-section-label">Administration</div>
-                <a href="admin.html" class="sidebar-link active">
-                    <i class="bi bi-speedometer2" aria-hidden="true"></i><span>Tableau de bord</span>
+            <div class="user-menu" id="userMenu">
+                <a href="profil.html" class="user-menu-item">
+                    <i class="bi bi-person-circle"></i>Mon profil
                 </a>
-                <div class="sidebar-section-label mt-3">Mon espace</div>
-                <a href="dashboard.html" class="sidebar-link">
-                    <i class="bi bi-grid-fill" aria-hidden="true"></i><span>Espace citoyen</span>
-                </a>
-                <a href="profil.html" class="sidebar-link">
-                    <i class="bi bi-person-circle" aria-hidden="true"></i><span>Mon profil</span>
-                </a>
-                <button onclick="logout()" class="sidebar-link sidebar-logout" aria-label="Se déconnecter" title="Se déconnecter">
-                    <i class="bi bi-box-arrow-right" aria-hidden="true"></i><span>Se déconnecter</span>
+                <div class="user-menu-divider"></div>
+                <button onclick="logout()" class="user-menu-item user-menu-logout">
+                    <i class="bi bi-box-arrow-right"></i>Se déconnecter
                 </button>
-            </nav>
-        </aside>
-
-        <main class="app-main">
-
-            <div class="page-header">
-                <div>
-                    <h1 class="page-title">Administration</h1>
-                    <p class="page-subtitle">Gestion de toutes les demandes des citoyens</p>
-                </div>
-                <div class="d-flex gap-2 align-items-center">
-                    <button class="btn btn-gov-green" onclick="exporterCSV()" title="Exporter toutes les demandes en CSV">
-                        <i class="bi bi-download me-1" aria-hidden="true"></i>Exporter CSV
-                    </button>
-                    <div class="admin-header-badge">
-                        <i class="bi bi-shield-fill-check me-1" aria-hidden="true"></i>
-                        Administrateur
-                    </div>
-                </div>
-            </div>
-
-            <div id="msgAdmin" class="alert d-none mb-4" role="alert"></div>
-
-            <!-- STATS -->
-            <div class="row g-3 mb-4">
-                <div class="col-6 col-lg-3">
-                    <div class="stat-card-pro">
-                        <div class="stat-card-icon stat-icon-blue">
-                            <i class="bi bi-folder2-open" aria-hidden="true"></i>
-                        </div>
-                        <div class="stat-card-body">
-                            <div class="stat-card-num" id="adminTotal">0</div>
-                            <div class="stat-card-lbl">Total demandes</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-lg-3">
-                    <div class="stat-card-pro">
-                        <div class="stat-card-icon stat-icon-yellow">
-                            <i class="bi bi-hourglass-split" aria-hidden="true"></i>
-                        </div>
-                        <div class="stat-card-body">
-                            <div class="stat-card-num text-warning" id="adminAttente">0</div>
-                            <div class="stat-card-lbl">En attente</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-lg-3">
-                    <div class="stat-card-pro">
-                        <div class="stat-card-icon stat-icon-blue2">
-                            <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
-                        </div>
-                        <div class="stat-card-body">
-                            <div class="stat-card-num text-primary" id="adminEncours">0</div>
-                            <div class="stat-card-lbl">En cours</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-lg-3">
-                    <div class="stat-card-pro">
-                        <div class="stat-card-icon stat-icon-green">
-                            <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
-                        </div>
-                        <div class="stat-card-body">
-                            <div class="stat-card-num text-success" id="adminTermine">0</div>
-                            <div class="stat-card-lbl">Terminées</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- GRAPHIQUE -->
-            <div class="row g-3 mb-4">
-                <div class="col-lg-5">
-                    <div class="chart-card">
-                        <div class="chart-card-header">
-                            <i class="bi bi-pie-chart-fill me-2" aria-hidden="true"></i>
-                            Répartition par statut
-                        </div>
-                        <div class="chart-card-body">
-                            <canvas id="chartStatut" aria-label="Graphique des demandes par statut" role="img"></canvas>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-7">
-                    <div class="chart-card">
-                        <div class="chart-card-header">
-                            <i class="bi bi-bar-chart-fill me-2" aria-hidden="true"></i>
-                            Demandes par type de document
-                        </div>
-                        <div class="chart-card-body">
-                            <canvas id="chartType" aria-label="Graphique des demandes par type" role="img"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- FILTRES -->
-            <div class="admin-filtres-bar">
-                <div class="filters-bar-left">
-                    <h2 class="section-heading">Toutes les demandes</h2>
-                </div>
-                <div class="admin-filtres-right">
-                    <label for="adminFiltreStatut" class="label-sr">Filtrer par statut</label>
-                    <select id="adminFiltreStatut" class="form-select select-filter" onchange="filtrerAdmin()" title="Filtrer par statut" aria-label="Filtrer par statut">
-                        <option value="">Tous les statuts</option>
-                        <option value="En attente">En attente</option>
-                        <option value="En cours">En cours</option>
-                        <option value="Terminée">Terminée</option>
-                        <option value="Refusée">Refusée</option>
-                    </select>
-                    <div class="search-wrap">
-                        <i class="bi bi-search search-icon" aria-hidden="true"></i>
-                        <label for="adminSearch" class="label-sr">Rechercher</label>
-                        <input type="text" id="adminSearch" class="form-control search-input-pro" placeholder="Rechercher citoyen ou demande..." oninput="filtrerAdmin()" aria-label="Rechercher">
-                    </div>
-                </div>
-            </div>
-
-            <!-- TABLEAU -->
-            <div class="admin-table-card">
-                <div class="table-wrapper">
-                    <table class="admin-table" aria-label="Liste de toutes les demandes">
-                        <thead>
-                            <tr>
-                                <th scope="col">N°</th>
-                                <th scope="col">Citoyen</th>
-                                <th scope="col">Type de demande</th>
-                                <th scope="col">Description</th>
-                                <th scope="col">Statut</th>
-                                <th scope="col">Réponse admin</th>
-                                <th scope="col">Date</th>
-                                <th scope="col">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminTableBody">
-                            <tr>
-                                <td colspan="8" class="text-center p-4 text-muted">
-                                    <div class="spinner-border spinner-border-sm me-2" role="status">
-                                        <span class="visually-hidden">Chargement...</span>
-                                    </div>
-                                    Chargement...
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-        </main>
-    </div>
-
-    <!-- MODALE TRAITEMENT -->
-    <div class="modal fade" id="modaleStatut" tabindex="-1" aria-labelledby="modaleStatutLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content modal-gov">
-                <div class="modal-header modal-header-gov">
-                    <h5 class="modal-title" id="modaleStatutLabel">
-                        <i class="bi bi-pencil-square me-2" aria-hidden="true"></i>Traiter la demande
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <input type="hidden" id="statutDemandeId">
-
-                    <!-- Info demande -->
-                    <div class="demande-info-box mb-4">
-                        <div class="demande-info-label">Demande concernée</div>
-                        <div id="statutDemandeTitre" class="demande-info-titre"></div>
-                        <div id="statutDemandeDesc" class="demande-info-desc"></div>
-                        <div id="statutDemandeCitoyen" class="demande-info-citoyen"></div>
-                    </div>
-
-                    <div class="row g-3">
-                        <div class="col-md-5">
-                            <label for="nouveauStatut" class="form-label-gov">
-                                <i class="bi bi-arrow-repeat me-1" aria-hidden="true"></i>Changer le statut
-                            </label>
-                            <select id="nouveauStatut" class="form-select form-control-gov" title="Nouveau statut" aria-label="Nouveau statut">
-                                <option value="En attente">⏳ En attente</option>
-                                <option value="En cours">🔄 En cours de traitement</option>
-                                <option value="Terminée">✅ Terminée — Document prêt</option>
-                                <option value="Refusée">❌ Refusée</option>
-                            </select>
-                        </div>
-                        <div class="col-md-7">
-                            <label for="commentaireAdmin" class="form-label-gov">
-                                <i class="bi bi-chat-left-text-fill me-1" aria-hidden="true"></i>Message au citoyen
-                            </label>
-                            <textarea id="commentaireAdmin" class="form-control form-control-gov" rows="4"
-                                placeholder="Ex : Votre certificat de résidence est prêt. Venez le retirer au bureau 12 avec votre CIN.&#10;&#10;OU : Demande refusée. Il manque une photocopie de votre CIN. Veuillez soumettre une nouvelle demande."></textarea>
-                            <div class="form-hint mt-1">
-                                <i class="bi bi-info-circle me-1" aria-hidden="true"></i>
-                                Ce message sera visible par le citoyen dans sa demande.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer modal-footer-gov">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="button" class="btn btn-gov" onclick="sauvegarderStatut()">
-                        <i class="bi bi-check-lg me-1" aria-hidden="true"></i>Confirmer le traitement
-                    </button>
-                </div>
             </div>
         </div>
     </div>
+</header>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="script.js"></script>
-    <script>
-        // Graphiques Chart.js — initialisés après chargement des données
-        let chartStatut = null;
-        let chartType   = null;
+<div class="app-layout">
 
-        function initGraphiques(demandes) {
-            // Données statut
-            const stats = {
-                "En attente" : demandes.filter(d => d.statut === "En attente").length,
-                "En cours"   : demandes.filter(d => d.statut === "En cours").length,
-                "Terminée"   : demandes.filter(d => d.statut === "Terminée").length,
-                "Refusée"    : demandes.filter(d => d.statut === "Refusée").length
-            };
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-section">Administration</div>
+        <a href="admin.html" class="sidebar-link active">
+            <i class="bi bi-speedometer2"></i><span>Tableau de bord</span>
+        </a>
+        <div class="sidebar-section" style="margin-top:16px">Mon espace</div>
+        <a href="dashboard.html" class="sidebar-link">
+            <i class="bi bi-grid-fill"></i><span>Espace citoyen</span>
+        </a>
+        <a href="profil.html" class="sidebar-link">
+            <i class="bi bi-person-circle"></i><span>Mon profil</span>
+        </a>
+        <button onclick="logout()" class="sidebar-link sidebar-logout">
+            <i class="bi bi-box-arrow-right"></i><span>Se déconnecter</span>
+        </button>
+    </aside>
 
-            // Graphique camembert — statuts
-            const ctxStatut = document.getElementById("chartStatut");
-            if (ctxStatut) {
-                if (chartStatut) chartStatut.destroy();
-                chartStatut = new Chart(ctxStatut, {
-                    type: "doughnut",
-                    data: {
-                        labels: Object.keys(stats),
-                        datasets: [{
-                            data: Object.values(stats),
-                            backgroundColor: ["#fbbf24","#3b82f6","#22c55e","#ef4444"],
-                            borderWidth: 2,
-                            borderColor: "#fff"
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: { position: "bottom", labels: { font: { size: 12 }, padding: 16 } }
-                        },
-                        cutout: "60%"
-                    }
-                });
-            }
+    <!-- MAIN -->
+    <main class="app-main">
 
-            // Données par type de document
-            const typeCount = {};
-            demandes.forEach(d => {
-                const court = d.titre.replace("Certificat de ", "Cert. ").replace("Légalisation de document","Légalisation").replace("Autre demande","Autre");
-                typeCount[court] = (typeCount[court] || 0) + 1;
+        <!-- HEADER -->
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Administration</h1>
+                <p class="page-subtitle">Gestion de toutes les demandes des citoyens</p>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                <button class="btn-export" onclick="exporterCSV()">
+                    <i class="bi bi-download"></i>Exporter CSV
+                </button>
+                <div class="admin-header-badge">
+                    <i class="bi bi-shield-fill-check"></i>Administrateur
+                </div>
+            </div>
+        </div>
+
+        <!-- STATS -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon si-blue"><i class="bi bi-folder2-open"></i></div>
+                    <div>
+                        <div class="stat-num" id="adminTotal">0</div>
+                        <div class="stat-lbl">Total demandes</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon si-yellow"><i class="bi bi-hourglass-split"></i></div>
+                    <div>
+                        <div class="stat-num" id="adminAttente" style="color:#D97706">0</div>
+                        <div class="stat-lbl">En attente</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon si-cyan"><i class="bi bi-arrow-repeat"></i></div>
+                    <div>
+                        <div class="stat-num" id="adminEncours" style="color:#0891B2">0</div>
+                        <div class="stat-lbl">En cours</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon si-green"><i class="bi bi-check-circle-fill"></i></div>
+                    <div>
+                        <div class="stat-num" id="adminTermine" style="color:#15803D">0</div>
+                        <div class="stat-lbl">Terminées</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GRAPHIQUES -->
+        <div class="row g-3 mb-4">
+            <div class="col-lg-5">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <i class="bi bi-pie-chart-fill" style="color:#0B3D91"></i>
+                        Répartition par statut
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="chartStatut"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <i class="bi bi-bar-chart-fill" style="color:#0B3D91"></i>
+                        Demandes par type de document
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="chartType"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FILTRES -->
+        <div class="filtres-bar">
+            <div class="filtres-titre">Toutes les demandes</div>
+            <div class="filtres-right">
+                <select id="adminFiltreStatut" class="select-filtre" onchange="filtrerAdmin()">
+                    <option value="">Tous les statuts</option>
+                    <option value="En attente">En attente</option>
+                    <option value="En cours">En cours</option>
+                    <option value="Terminée">Terminée</option>
+                    <option value="Refusée">Refusée</option>
+                </select>
+                <div class="search-box">
+                    <i class="bi bi-search search-icon"></i>
+                    <input type="text" id="adminSearch" class="search-input"
+                           placeholder="Rechercher citoyen ou demande..."
+                           oninput="filtrerAdmin()">
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLEAU -->
+        <div class="table-card">
+            <div style="overflow-x:auto">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>N°</th>
+                            <th>Citoyen</th>
+                            <th>Type de demande</th>
+                            <th>Description</th>
+                            <th>Statut</th>
+                            <th>Réponse admin</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminTableBody">
+                        <tr>
+                            <td colspan="8" style="text-align:center;padding:32px;color:#94A3B8">
+                                <div class="spinner-border spinner-border-sm me-2"></div>
+                                Chargement...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- MODALE TRAITEMENT -->
+<div class="modal fade modal-gov" id="modaleStatut" tabindex="-1" aria-labelledby="modaleStatutLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modaleStatutLabel">
+                    <i class="bi bi-pencil-square me-2"></i>Traiter la demande
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="statutDemandeId">
+                <div class="demande-info-box">
+                    <div class="demande-info-label">Demande concernée</div>
+                    <div id="statutDemandeTitre" class="demande-info-titre"></div>
+                    <div id="statutDemandeDesc" class="demande-info-desc"></div>
+                    <div id="statutDemandeCitoyen" class="demande-info-citoyen"></div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <label class="form-label-gov">
+                            <i class="bi bi-arrow-repeat me-1"></i>Changer le statut
+                        </label>
+                        <select id="nouveauStatut" class="form-control-gov">
+                            <option value="En attente">⏳ En attente</option>
+                            <option value="En cours">🔄 En cours de traitement</option>
+                            <option value="Terminée">✅ Terminée — Document prêt</option>
+                            <option value="Refusée">❌ Refusée</option>
+                        </select>
+                    </div>
+                    <div class="col-md-7">
+                        <label class="form-label-gov">
+                            <i class="bi bi-chat-left-text-fill me-1"></i>Message au citoyen
+                        </label>
+                        <textarea id="commentaireAdmin" class="form-control-gov" rows="4"
+                            placeholder="Ex : Votre certificat est prêt. Venez le retirer au bureau 12 avec votre CIN."></textarea>
+                        <div class="form-hint mt-1">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Ce message sera visible par le citoyen.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn-confirmer" onclick="sauvegarderStatut()">
+                    <i class="bi bi-check-lg me-1"></i>Confirmer le traitement
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="script.js"></script>
+<script>
+    let chartStatut = null;
+    let chartType   = null;
+
+    function initGraphiques(demandes) {
+        const stats = {
+            "En attente": demandes.filter(d => d.statut === "En attente").length,
+            "En cours":   demandes.filter(d => d.statut === "En cours").length,
+            "Terminée":   demandes.filter(d => d.statut === "Terminée").length,
+            "Refusée":    demandes.filter(d => d.statut === "Refusée").length
+        };
+
+        const ctxS = document.getElementById("chartStatut");
+        if (ctxS) {
+            if (chartStatut) chartStatut.destroy();
+            chartStatut = new Chart(ctxS, {
+                type: "doughnut",
+                data: {
+                    labels: Object.keys(stats),
+                    datasets: [{
+                        data: Object.values(stats),
+                        backgroundColor: ["#FBBF24","#3B82F6","#22C55E","#EF4444"],
+                        borderWidth: 2, borderColor: "#fff"
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: "bottom", labels: { font: { size: 12 }, padding: 16 } } },
+                    cutout: "60%"
+                }
             });
+        }
 
-            // Graphique barres — types
-            const ctxType = document.getElementById("chartType");
-            if (ctxType) {
-                if (chartType) chartType.destroy();
-                chartType = new Chart(ctxType, {
-                    type: "bar",
-                    data: {
-                        labels: Object.keys(typeCount),
-                        datasets: [{
-                            label: "Nombre de demandes",
-                            data: Object.values(typeCount),
-                            backgroundColor: "#003189",
-                            borderRadius: 6,
-                            borderSkipped: false
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            y: { beginAtZero: true, ticks: { stepSize: 1 } },
-                            x: { ticks: { font: { size: 11 } } }
-                        }
+        const typeCount = {};
+        demandes.forEach(d => {
+            const court = (d.titre || "Autre")
+                .replace("Certificat de résidence","Cert. résidence")
+                .replace("Certificat de vie","Cert. vie")
+                .replace("Légalisation de document","Légalisation")
+                .replace("Autre demande","Autre");
+            typeCount[court] = (typeCount[court] || 0) + 1;
+        });
+
+        const ctxT = document.getElementById("chartType");
+        if (ctxT) {
+            if (chartType) chartType.destroy();
+            chartType = new Chart(ctxT, {
+                type: "bar",
+                data: {
+                    labels: Object.keys(typeCount),
+                    datasets: [{
+                        label: "Demandes",
+                        data: Object.values(typeCount),
+                        backgroundColor: "#0B3D91",
+                        borderRadius: 6, borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } },
+                        x: { ticks: { font: { size: 11 } } }
                     }
-                });
-            }
+                }
+            });
         }
+    }
 
-        // Export CSV
-        function exporterCSV() {
-            if (!toutesDemandesAdmin || toutesDemandesAdmin.length === 0) {
-                afficherToast("Aucune donnée à exporter", "warning");
-                return;
-            }
-
-            const entetes = ["ID","Citoyen","Email","Type","Description","Statut","Réponse admin","Date dépôt","Date traitement"];
-            const lignes  = toutesDemandesAdmin.map(d => [
-                d.id,
-                `"${(d.user_nom || "").replace(/"/g,'""')}"`,
-                `"${(d.user_email || "").replace(/"/g,'""')}"`,
-                `"${(d.titre || "").replace(/"/g,'""')}"`,
-                `"${(d.description || "").replace(/"/g,'""')}"`,
-                d.statut,
-                `"${(d.commentaire_admin || "").replace(/"/g,'""')}"`,
-                d.created_at ? new Date(d.created_at).toLocaleDateString("fr-FR") : "",
-                d.updated_at ? new Date(d.updated_at).toLocaleDateString("fr-FR") : ""
-            ]);
-
-            const csv     = [entetes.join(","), ...lignes.map(l => l.join(","))].join("\n");
-            const blob    = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
-            const url     = URL.createObjectURL(blob);
-            const lien    = document.createElement("a");
-            lien.href     = url;
-            lien.download = `demandes_${new Date().toISOString().slice(0,10)}.csv`;
-            lien.click();
-            URL.revokeObjectURL(url);
-            afficherToast("Export CSV téléchargé !", "success");
+    function exporterCSV() {
+        if (!toutesDemandesAdmin || toutesDemandesAdmin.length === 0) {
+            afficherToast("Aucune donnée à exporter", "warning"); return;
         }
-
-        // Les graphiques sont initialisés automatiquement
-        // depuis script.js via chargerToutesLesDemandes → afficherTableAdmin → initGraphiques
-        // Pas besoin d'override ici
-    </script>
+        const entetes = ["ID","Citoyen","Email","Type","Description","Statut","Réponse admin","Date dépôt"];
+        const lignes  = toutesDemandesAdmin.map(d => [
+            d.id,
+            '"' + (d.user_nom || "").replace(/"/g,'""') + '"',
+            '"' + (d.user_email || "").replace(/"/g,'""') + '"',
+            '"' + (d.titre || "").replace(/"/g,'""') + '"',
+            '"' + (d.description || "").replace(/"/g,'""') + '"',
+            d.statut,
+            '"' + (d.commentaire_admin || "").replace(/"/g,'""') + '"',
+            d.created_at ? new Date(d.created_at).toLocaleDateString("fr-FR") : ""
+        ]);
+        const csv  = [entetes.join(","), ...lignes.map(l => l.join(","))].join("\n");
+        const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement("a");
+        a.href     = url;
+        a.download = "demandes_" + new Date().toISOString().slice(0,10) + ".csv";
+        a.click();
+        URL.revokeObjectURL(url);
+        afficherToast("Export CSV téléchargé !", "success");
+    }
+</script>
 </body>
 </html>
