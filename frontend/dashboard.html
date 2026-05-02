@@ -6,250 +6,628 @@
     <title>Tableau de bord — CommuneService</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Marianne:wght@400;500;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body class="page-app">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bleu:     #0B3D91;
+            --bleu-vif: #1565C0;
+            --or:       #F4A800;
+            --texte:    #0D1B2A;
+            --gris:     #64748B;
+            --fond:     #F1F5F9;
+            --blanc:    #FFFFFF;
+            --bordure:  #E2E8F0;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--fond); color:var(--texte); }
 
-    <!-- TOPBAR -->
-    <header class="topbar">
-        <div class="topbar-brand">
-            <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" aria-label="Ouvrir le menu" title="Menu">
-                <i class="bi bi-list" aria-hidden="true"></i>
-            </button>
-            <a href="index.html" class="topbar-logo">
-                <i class="bi bi-building-fill me-2"></i>
-                <span>CommuneService</span>
-            </a>
-        </div>
-        <div class="topbar-actions">
-            <a href="demande.html" class="btn btn-gov btn-sm d-none d-sm-inline-flex">
-                <i class="bi bi-plus-circle-fill me-1"></i>Nouvelle demande
-            </a>
-            <div class="topbar-user" onclick="toggleUserMenu()">
+        /* ── TOPBAR ─────────────────────────────── */
+        .topbar {
+            position:sticky; top:0; z-index:100;
+            background:var(--bleu); color:#fff;
+            display:flex; align-items:center; justify-content:space-between;
+            padding:0 20px; height:56px;
+            box-shadow:0 2px 12px rgba(0,0,0,.2);
+        }
+        .topbar-brand { display:flex; align-items:center; gap:10px; }
+        .sidebar-toggle {
+            background:none; border:none; color:#fff;
+            font-size:22px; cursor:pointer; padding:4px 8px;
+            border-radius:6px; transition:background .2s; display:none;
+        }
+        .sidebar-toggle:hover { background:rgba(255,255,255,.15); }
+        .topbar-logo {
+            display:flex; align-items:center; gap:8px;
+            color:#fff; text-decoration:none; font-weight:700; font-size:16px;
+        }
+        .topbar-actions { display:flex; align-items:center; gap:10px; }
+        .btn-new-top {
+            background:var(--or); color:var(--texte);
+            border:none; border-radius:7px; padding:7px 16px;
+            font-size:13px; font-weight:700; font-family:inherit;
+            cursor:pointer; text-decoration:none;
+            display:flex; align-items:center; gap:6px;
+            transition:all .2s;
+        }
+        .btn-new-top:hover { background:#E69900; transform:translateY(-1px); }
+        .user-wrap { position:relative; }
+        .user-btn {
+            display:flex; align-items:center; gap:8px;
+            cursor:pointer; padding:4px 8px; border-radius:8px;
+            transition:background .2s;
+        }
+        .user-btn:hover { background:rgba(255,255,255,.1); }
+        .user-avatar {
+            width:32px; height:32px; border-radius:50%;
+            background:var(--or); color:var(--texte);
+            display:flex; align-items:center; justify-content:center;
+            font-weight:800; font-size:14px;
+        }
+        .user-name { color:#fff; font-size:13px; font-weight:600; }
+        .user-menu {
+            position:absolute; top:44px; right:0;
+            background:#fff; border-radius:12px;
+            box-shadow:0 8px 32px rgba(0,0,0,.15);
+            min-width:190px; padding:8px 0;
+            display:none; z-index:200;
+        }
+        .user-menu.open { display:block; }
+        .user-menu-item {
+            display:flex; align-items:center; gap:10px;
+            padding:11px 16px; color:#374151; font-size:14px;
+            text-decoration:none; transition:background .15s;
+            background:none; border:none; width:100%; cursor:pointer;
+            font-family:inherit;
+        }
+        .user-menu-item:hover { background:#F3F4F6; }
+        .user-menu-logout { color:#DC2626; }
+        .user-menu-logout:hover { background:#FEF2F2; }
+        .user-menu-divider { height:1px; background:#E5E7EB; margin:4px 0; }
+
+        /* ── LAYOUT ─────────────────────────────── */
+        .app-layout { display:flex; min-height:calc(100vh - 56px); }
+
+        /* ── SIDEBAR ─────────────────────────────── */
+        .sidebar {
+            width:220px; flex-shrink:0;
+            background:var(--blanc); border-right:1px solid var(--bordure);
+            padding:20px 0; position:sticky; top:56px;
+            height:calc(100vh - 56px); overflow-y:auto;
+        }
+        .sidebar-section {
+            font-size:10px; font-weight:700; color:#94A3B8;
+            text-transform:uppercase; letter-spacing:.08em;
+            padding:0 16px; margin:16px 0 6px;
+        }
+        .sidebar-link {
+            display:flex; align-items:center; gap:10px;
+            padding:10px 16px; color:#475569; font-size:14px; font-weight:500;
+            text-decoration:none; border-radius:8px; margin:2px 8px;
+            transition:all .15s; background:none; border:none;
+            width:calc(100% - 16px); cursor:pointer; font-family:inherit;
+        }
+        .sidebar-link:hover { background:#F1F5F9; color:var(--bleu); }
+        .sidebar-link.active { background:#EFF6FF; color:var(--bleu); font-weight:700; }
+        .sidebar-logout { color:#DC2626; }
+        .sidebar-logout:hover { background:#FEF2F2; color:#B91C1C; }
+
+        /* ── MAIN ───────────────────────────────── */
+        .app-main { flex:1; padding:28px; overflow-x:hidden; }
+
+        /* ── PAGE HEADER ────────────────────────── */
+        .page-header {
+            display:flex; align-items:flex-start; justify-content:space-between;
+            flex-wrap:wrap; gap:12px; margin-bottom:28px;
+        }
+        .page-greeting { font-size:22px; font-weight:800; color:var(--texte); margin:0; }
+        .page-greeting span { color:var(--bleu); }
+        .page-subtitle { font-size:14px; color:var(--gris); margin:4px 0 0; }
+        .btn-nouvelle {
+            background:var(--bleu); color:#fff;
+            border:none; border-radius:10px; padding:11px 22px;
+            font-size:14px; font-weight:700; font-family:inherit;
+            cursor:pointer; text-decoration:none;
+            display:inline-flex; align-items:center; gap:8px;
+            transition:all .2s;
+        }
+        .btn-nouvelle:hover { background:var(--bleu-vif); transform:translateY(-1px); box-shadow:0 6px 20px rgba(11,61,145,.3); }
+
+        /* ── STAT CARDS ─────────────────────────── */
+        .stat-card {
+            background:var(--blanc); border-radius:14px; padding:20px;
+            border:1px solid var(--bordure); display:flex; align-items:center; gap:16px;
+            transition:all .2s;
+        }
+        .stat-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.08); }
+        .stat-icon {
+            width:48px; height:48px; border-radius:12px;
+            display:flex; align-items:center; justify-content:center;
+            font-size:22px; flex-shrink:0;
+        }
+        .si-blue   { background:#EFF6FF; color:#1D4ED8; }
+        .si-yellow { background:#FFFBEB; color:#D97706; }
+        .si-cyan   { background:#ECFEFF; color:#0891B2; }
+        .si-green  { background:#F0FDF4; color:#15803D; }
+        .stat-num { font-size:28px; font-weight:800; color:var(--texte); line-height:1; }
+        .stat-lbl { font-size:12px; color:var(--gris); margin-top:2px; }
+
+        /* ── BANNIÈRE NOUVELLE DEMANDE ───────────── */
+        .banner-nouvelle {
+            background:linear-gradient(135deg, var(--bleu) 0%, #1A237E 100%);
+            border-radius:16px; padding:24px 28px;
+            display:flex; align-items:center; justify-content:space-between;
+            gap:16px; margin-bottom:24px; flex-wrap:wrap;
+        }
+        .banner-text { color:#fff; }
+        .banner-titre { font-size:17px; font-weight:800; margin-bottom:4px; }
+        .banner-desc  { font-size:13px; color:rgba(255,255,255,.8); }
+        .btn-banner {
+            background:var(--or); color:var(--texte);
+            border:none; border-radius:8px; padding:10px 22px;
+            font-size:14px; font-weight:800; font-family:inherit;
+            cursor:pointer; text-decoration:none; white-space:nowrap;
+            display:inline-flex; align-items:center; gap:8px;
+            transition:all .2s; flex-shrink:0;
+        }
+        .btn-banner:hover { background:#E69900; transform:translateY(-1px); }
+
+        /* ── FILTRES ─────────────────────────────── */
+        .filtres-bar {
+            background:var(--blanc); border-radius:14px; border:1px solid var(--bordure);
+            padding:16px 20px; margin-bottom:16px;
+            display:flex; align-items:center; justify-content:space-between;
+            flex-wrap:wrap; gap:12px;
+        }
+        .filtres-titre { font-size:16px; font-weight:700; color:var(--texte); }
+        .filtres-right { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+        .search-box { position:relative; display:flex; align-items:center; }
+        .search-icon { position:absolute; left:10px; color:#94A3B8; font-size:14px; }
+        .search-input {
+            border:1.5px solid var(--bordure); border-radius:8px;
+            padding:8px 14px 8px 32px; font-size:13px; width:200px;
+            font-family:inherit; transition:border-color .2s;
+        }
+        .search-input:focus { outline:none; border-color:var(--bleu); }
+        .select-filtre {
+            border:1.5px solid var(--bordure); border-radius:8px;
+            padding:8px 14px; font-size:13px; font-family:inherit;
+            background:var(--blanc); cursor:pointer; color:#374151;
+        }
+        .btn-reset {
+            background:none; border:1.5px solid var(--bordure); border-radius:8px;
+            padding:8px 12px; color:var(--gris); cursor:pointer; transition:all .2s;
+        }
+        .btn-reset:hover { border-color:#94A3B8; color:var(--texte); }
+
+        /* ── DEMANDE CARDS ──────────────────────── */
+        .demande-card {
+            background:var(--blanc); border-radius:14px;
+            border:1px solid var(--bordure); padding:20px 24px;
+            margin-bottom:12px; transition:all .2s;
+        }
+        .demande-card:hover { border-color:#C7D7F5; box-shadow:0 4px 16px rgba(11,61,145,.08); }
+        .demande-card-header {
+            display:flex; align-items:flex-start; justify-content:space-between;
+            gap:12px; margin-bottom:10px;
+        }
+        .demande-card-title {
+            font-size:15px; font-weight:700; color:var(--texte);
+            display:flex; align-items:center; gap:8px; margin:0;
+        }
+        .demande-card-title i { color:var(--bleu); }
+        .demande-card-desc { font-size:13px; color:var(--gris); line-height:1.6; margin-bottom:12px; }
+        .demande-card-meta { font-size:12px; color:#94A3B8; margin-bottom:14px; }
+
+        /* RÉPONSE ADMIN */
+        .reponse-admin {
+            background:#EFF6FF; border-left:3px solid var(--bleu);
+            border-radius:0 8px 8px 0; padding:10px 14px;
+            font-size:13px; color:var(--bleu); margin-bottom:12px;
+            display:flex; align-items:flex-start; gap:8px;
+        }
+        .reponse-admin strong { font-weight:700; }
+
+        /* ACTIONS */
+        .demande-card-actions { display:flex; gap:8px; flex-wrap:wrap; }
+        .btn-voir {
+            background:#F1F5F9; color:var(--texte); border:1px solid var(--bordure);
+            border-radius:7px; padding:7px 14px; font-size:12px; font-weight:600;
+            cursor:pointer; font-family:inherit; transition:all .15s;
+            display:flex; align-items:center; gap:5px;
+        }
+        .btn-voir:hover { background:#E2E8F0; }
+        .btn-modif {
+            background:#EFF6FF; color:var(--bleu); border:1px solid #BFDBFE;
+            border-radius:7px; padding:7px 14px; font-size:12px; font-weight:600;
+            cursor:pointer; font-family:inherit; transition:all .15s;
+            display:flex; align-items:center; gap:5px;
+        }
+        .btn-modif:hover { background:#DBEAFE; }
+        .btn-suppr {
+            background:#FFF1F2; color:#BE123C; border:1px solid #FECDD3;
+            border-radius:7px; padding:7px 14px; font-size:12px; font-weight:600;
+            cursor:pointer; font-family:inherit; transition:all .15s;
+            display:flex; align-items:center; gap:5px;
+        }
+        .btn-suppr:hover { background:#FFE4E6; }
+        .btn-print {
+            background:#F0FDF4; color:#15803D; border:1px solid #BBF7D0;
+            border-radius:7px; padding:7px 14px; font-size:12px; font-weight:600;
+            cursor:pointer; font-family:inherit; transition:all .15s;
+            display:flex; align-items:center; gap:5px;
+        }
+        .btn-print:hover { background:#DCFCE7; }
+        .badge-locked {
+            background:#F8FAFC; color:#94A3B8; border:1px solid var(--bordure);
+            border-radius:7px; padding:7px 14px; font-size:12px; font-weight:600;
+            display:flex; align-items:center; gap:5px;
+        }
+
+        /* BADGES STATUT */
+        .badge-statut {
+            padding:5px 12px; border-radius:20px;
+            font-size:11px; font-weight:700; white-space:nowrap;
+        }
+        .badge-attente { background:#FFFBEB; color:#D97706; border:1px solid #FDE68A; }
+        .badge-encours { background:#EFF6FF; color:#1D4ED8; border:1px solid #BFDBFE; }
+        .badge-termine { background:#F0FDF4; color:#15803D; border:1px solid #BBF7D0; }
+        .badge-refuse  { background:#FFF1F2; color:#BE123C; border:1px solid #FECDD3; }
+
+        /* EMPTY STATE */
+        .empty-state {
+            background:var(--blanc); border-radius:16px; border:1px solid var(--bordure);
+            padding:60px 24px; text-align:center;
+        }
+        .empty-state-icon { font-size:48px; color:#CBD5E1; margin-bottom:16px; }
+        .empty-state-title { font-size:18px; font-weight:700; color:var(--texte); margin-bottom:8px; }
+        .empty-state-desc  { font-size:14px; color:var(--gris); margin-bottom:24px; }
+
+        /* LOADING */
+        .loading-state {
+            background:var(--blanc); border-radius:16px; border:1px solid var(--bordure);
+            padding:60px 24px; text-align:center; color:var(--gris);
+        }
+
+        /* PAGINATION */
+        .pagination-wrap {
+            display:flex; justify-content:center; gap:6px; margin-top:20px;
+        }
+        .btn-page {
+            background:var(--blanc); border:1.5px solid var(--bordure);
+            border-radius:8px; padding:8px 14px; font-size:13px; font-weight:600;
+            cursor:pointer; transition:all .15s; color:#374151; font-family:inherit;
+        }
+        .btn-page:hover { border-color:var(--bleu); color:var(--bleu); }
+        .btn-page.active { background:var(--bleu); border-color:var(--bleu); color:#fff; }
+        .btn-page:disabled { opacity:.4; cursor:not-allowed; }
+
+        /* MODALE */
+        .modal-gov .modal-content { border-radius:16px; border:none; overflow:hidden; }
+        .modal-gov .modal-header { background:var(--bleu); color:#fff; padding:18px 24px; }
+        .modal-gov .modal-title  { font-weight:700; font-size:16px; }
+        .modal-gov .btn-close    { filter:brightness(0) invert(1); }
+        .modal-gov .modal-body   { padding:24px; }
+        .modal-gov .modal-footer { padding:16px 24px; border-top:1px solid var(--bordure); }
+        .form-label-gov {
+            display:block; font-size:13px; font-weight:700;
+            color:#374151; margin-bottom:6px;
+        }
+        .form-control-gov {
+            width:100%; border:1.5px solid var(--bordure); border-radius:8px;
+            padding:10px 14px; font-size:14px; font-family:inherit;
+            transition:border-color .2s;
+        }
+        .form-control-gov:focus { outline:none; border-color:var(--bleu); box-shadow:0 0 0 3px rgba(11,61,145,.1); }
+        .detail-table { width:100%; border-collapse:collapse; }
+        .detail-table td { padding:10px 12px; border-bottom:1px solid var(--bordure); font-size:14px; }
+        .detail-table td:first-child { font-weight:700; color:var(--gris); width:140px; }
+        .btn-confirmer {
+            background:var(--bleu); color:#fff; border:none; border-radius:8px;
+            padding:10px 24px; font-weight:700; font-size:14px; cursor:pointer;
+            font-family:inherit; transition:all .2s;
+        }
+        .btn-confirmer:hover { background:var(--bleu-vif); }
+        .btn-imprimer {
+            background:#0F766E; color:#fff; border:none; border-radius:8px;
+            padding:10px 20px; font-weight:700; font-size:14px; cursor:pointer;
+            font-family:inherit; transition:all .2s;
+            display:flex; align-items:center; gap:6px;
+        }
+        .btn-imprimer:hover { background:#0D9488; }
+
+        /* RESPONSIVE */
+        @media (max-width: 991px) {
+            .sidebar { display:none; }
+            .sidebar.open { display:block; position:fixed; top:56px; left:0; z-index:50; height:calc(100vh - 56px); box-shadow:4px 0 20px rgba(0,0,0,.15); }
+            .sidebar-toggle { display:block; }
+            .app-main { padding:16px; }
+            .filtres-bar { flex-direction:column; align-items:stretch; }
+            .filtres-right { flex-direction:column; }
+            .search-input { width:100%; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+    <div class="topbar-brand">
+        <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Menu">
+            <i class="bi bi-list"></i>
+        </button>
+        <a href="index.html" class="topbar-logo">
+            <i class="bi bi-building-fill"></i>
+            <span>CommuneService</span>
+        </a>
+    </div>
+    <div class="topbar-actions">
+        <a href="demande.html" class="btn-new-top d-none d-sm-flex">
+            <i class="bi bi-plus-circle-fill"></i>Nouvelle demande
+        </a>
+        <div class="user-wrap">
+            <div class="user-btn" onclick="toggleUserMenu()">
                 <div class="user-avatar" id="topbarAvatar">?</div>
                 <span class="user-name d-none d-md-inline" id="topbarNom">...</span>
-                <i class="bi bi-chevron-down ms-1 chevron-user" aria-hidden="true"></i>
-                <div class="user-menu" id="userMenu">
-                    <a href="profil.html" class="user-menu-item">
-                        <i class="bi bi-person-circle"></i>Mon profil
-                    </a>
-                    <div class="user-menu-divider"></div>
-                    <button onclick="logout()" class="user-menu-item user-menu-logout" aria-label="Se déconnecter" title="Se déconnecter">
-                        <i class="bi bi-box-arrow-right"></i>Se déconnecter
-                    </button>
+                <i class="bi bi-chevron-down" style="color:#fff;font-size:12px"></i>
+            </div>
+            <div class="user-menu" id="userMenu">
+                <a href="profil.html" class="user-menu-item">
+                    <i class="bi bi-person-circle"></i>Mon profil
+                </a>
+                <div class="user-menu-divider"></div>
+                <button onclick="logout()" class="user-menu-item user-menu-logout">
+                    <i class="bi bi-box-arrow-right"></i>Se déconnecter
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-section">Principal</div>
+        <a href="dashboard.html" class="sidebar-link active">
+            <i class="bi bi-grid-fill"></i><span>Tableau de bord</span>
+        </a>
+        <a href="demande.html" class="sidebar-link">
+            <i class="bi bi-file-earmark-plus-fill"></i><span>Nouvelle demande</span>
+        </a>
+        <div class="sidebar-section" style="margin-top:16px">Mon compte</div>
+        <a href="profil.html" class="sidebar-link">
+            <i class="bi bi-person-circle"></i><span>Mon profil</span>
+        </a>
+        <button onclick="logout()" class="sidebar-link sidebar-logout">
+            <i class="bi bi-box-arrow-right"></i><span>Se déconnecter</span>
+        </button>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="app-main">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <div>
+                <h1 class="page-greeting">
+                    Bonjour, <span id="nomUtilisateur">...</span> 👋
+                </h1>
+                <p class="page-subtitle">Gérez et suivez vos demandes administratives</p>
+            </div>
+            <a href="demande.html" class="btn-nouvelle">
+                <i class="bi bi-plus-circle-fill"></i>Nouvelle demande
+            </a>
+        </div>
+
+        <!-- STATS -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon si-blue"><i class="bi bi-folder2-open"></i></div>
+                    <div>
+                        <div class="stat-num" id="statTotal">0</div>
+                        <div class="stat-lbl">Total demandes</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon si-yellow"><i class="bi bi-hourglass-split"></i></div>
+                    <div>
+                        <div class="stat-num" id="statAttente" style="color:#D97706">0</div>
+                        <div class="stat-lbl">En attente</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon si-cyan"><i class="bi bi-arrow-repeat"></i></div>
+                    <div>
+                        <div class="stat-num" id="statEncours" style="color:#0891B2">0</div>
+                        <div class="stat-lbl">En cours</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon si-green"><i class="bi bi-check-circle-fill"></i></div>
+                    <div>
+                        <div class="stat-num" id="statTermine" style="color:#15803D">0</div>
+                        <div class="stat-lbl">Terminées</div>
+                    </div>
                 </div>
             </div>
         </div>
-    </header>
 
-    <div class="app-layout">
+        <!-- BANNIÈRE -->
+        <div class="banner-nouvelle">
+            <div class="banner-text">
+                <div class="banner-titre">📄 Besoin d'un document officiel ?</div>
+                <div class="banner-desc">Soumettez une nouvelle demande en quelques clics — certificat, acte ou légalisation.</div>
+            </div>
+            <a href="demande.html" class="btn-banner">
+                <i class="bi bi-plus-circle-fill"></i>Nouvelle demande
+            </a>
+        </div>
 
-        <!-- SIDEBAR -->
-        <aside class="sidebar" id="sidebar">
-            <nav class="sidebar-nav">
-                <div class="sidebar-section-label">Principal</div>
-                <a href="dashboard.html" class="sidebar-link active">
-                    <i class="bi bi-grid-fill"></i>
-                    <span>Tableau de bord</span>
-                </a>
-                <a href="demande.html" class="sidebar-link">
-                    <i class="bi bi-file-earmark-plus-fill"></i>
-                    <span>Nouvelle demande</span>
-                </a>
-                <div class="sidebar-section-label mt-3">Mon compte</div>
-                <a href="profil.html" class="sidebar-link">
-                    <i class="bi bi-person-circle"></i>
-                    <span>Mon profil</span>
-                </a>
-                <button onclick="logout()" class="sidebar-link sidebar-logout" aria-label="Se déconnecter" title="Se déconnecter">
-                    <i class="bi bi-box-arrow-right"></i>
-                    <span>Se déconnecter</span>
+        <!-- FILTRES -->
+        <div class="filtres-bar">
+            <div class="filtres-titre">Mes demandes</div>
+            <div class="filtres-right">
+                <div class="search-box">
+                    <i class="bi bi-search search-icon"></i>
+                    <input type="text" id="searchInput" class="search-input"
+                           placeholder="Rechercher..." oninput="filtrerDemandes()">
+                </div>
+                <select id="filtreStatut" class="select-filtre" onchange="filtrerDemandes()">
+                    <option value="">Tous les statuts</option>
+                    <option value="En attente">En attente</option>
+                    <option value="En cours">En cours</option>
+                    <option value="Terminée">Terminée</option>
+                    <option value="Refusée">Refusée</option>
+                </select>
+                <select id="filtreType" class="select-filtre" onchange="filtrerDemandes()">
+                    <option value="">Tous les types</option>
+                    <option value="Certificat de résidence">Certificat de résidence</option>
+                    <option value="Acte de naissance">Acte de naissance</option>
+                    <option value="Acte de mariage">Acte de mariage</option>
+                    <option value="Certificat de vie">Certificat de vie</option>
+                    <option value="Légalisation de document">Légalisation</option>
+                    <option value="Autre demande">Autre</option>
+                </select>
+                <button class="btn-reset" onclick="resetFiltres()" title="Réinitialiser">
+                    <i class="bi bi-x-circle"></i>
                 </button>
-            </nav>
-        </aside>
-
-        <!-- CONTENU PRINCIPAL -->
-        <main class="app-main">
-
-            <!-- HEADER PAGE -->
-            <div class="page-header">
-                <div>
-                    <h1 class="page-title">
-                        Bonjour, <span id="nomUtilisateur">...</span> 👋
-                    </h1>
-                    <p class="page-subtitle">Gérez et suivez vos demandes administratives</p>
-                </div>
-                <a href="demande.html" class="btn btn-gov">
-                    <i class="bi bi-plus-circle-fill me-2"></i>
-                    Nouvelle demande
-                </a>
             </div>
+        </div>
 
-            <!-- MESSAGE RETOUR -->
-            <div id="msgDashboard" class="alert d-none mb-4" role="alert"></div>
-
-            <!-- CARTES STATISTIQUES -->
-            <div class="row g-3 mb-4">
-                <div class="col-6 col-lg-3">
-                    <div class="stat-card-pro">
-                        <div class="stat-card-icon stat-icon-blue">
-                            <i class="bi bi-folder2-open"></i>
-                        </div>
-                        <div class="stat-card-body">
-                            <div class="stat-card-num" id="statTotal">0</div>
-                            <div class="stat-card-lbl">Total demandes</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-lg-3">
-                    <div class="stat-card-pro">
-                        <div class="stat-card-icon stat-icon-yellow">
-                            <i class="bi bi-hourglass-split"></i>
-                        </div>
-                        <div class="stat-card-body">
-                            <div class="stat-card-num text-warning" id="statAttente">0</div>
-                            <div class="stat-card-lbl">En attente</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-lg-3">
-                    <div class="stat-card-pro">
-                        <div class="stat-card-icon stat-icon-blue2">
-                            <i class="bi bi-arrow-repeat"></i>
-                        </div>
-                        <div class="stat-card-body">
-                            <div class="stat-card-num text-primary" id="statEncours">0</div>
-                            <div class="stat-card-lbl">En cours</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-lg-3">
-                    <div class="stat-card-pro">
-                        <div class="stat-card-icon stat-icon-green">
-                            <i class="bi bi-check-circle-fill"></i>
-                        </div>
-                        <div class="stat-card-body">
-                            <div class="stat-card-num text-success" id="statTermine">0</div>
-                            <div class="stat-card-lbl">Terminées</div>
-                        </div>
-                    </div>
-                </div>
+        <!-- LISTE DEMANDES -->
+        <div id="listeDemandes">
+            <div class="loading-state">
+                <div class="spinner-border text-primary mb-3" role="status"></div>
+                <p>Chargement de vos demandes...</p>
             </div>
+        </div>
 
-            <!-- FILTRES -->
-            <div class="filters-bar mb-3">
-                <div class="filters-bar-left">
-                    <h2 class="section-heading">Mes demandes</h2>
-                </div>
-                <div class="filters-bar-right">
-                    <div class="search-wrap">
-                        <i class="bi bi-search search-icon"></i>
-                        <input
-                            type="text"
-                            id="searchInput"
-                            class="form-control search-input-pro"
-                            placeholder="Rechercher..."
-                            oninput="filtrerDemandes()">
-                    </div>
-                    <select id="filtreStatut" class="form-select select-filter" onchange="filtrerDemandes()" title="Filtrer par statut" aria-label="Filtrer par statut">
-                        <option value="">Tous les statuts</option>
-                        <option value="En attente">En attente</option>
-                        <option value="En cours">En cours</option>
-                        <option value="Terminée">Terminée</option>
-                        <option value="Refusée">Refusée</option>
-                    </select>
-                    <select id="filtreType" class="form-select select-filter" onchange="filtrerDemandes()" title="Filtrer par type" aria-label="Filtrer par type">
-                        <option value="">Tous les types</option>
+        <!-- PAGINATION -->
+        <nav id="pagination" class="pagination-wrap" aria-label="Pagination"></nav>
+
+    </main>
+</div>
+
+<!-- MODALE MODIFICATION -->
+<div class="modal fade modal-gov" id="modaleModif" tabindex="-1" aria-labelledby="modaleModifLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modaleModifLabel">
+                    <i class="bi bi-pencil-fill me-2"></i>Modifier la demande
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="modifId">
+                <div class="mb-3">
+                    <label for="modifTitre" class="form-label-gov">Type de demande</label>
+                    <select id="modifTitre" class="form-control-gov">
                         <option value="Certificat de résidence">Certificat de résidence</option>
                         <option value="Acte de naissance">Acte de naissance</option>
                         <option value="Acte de mariage">Acte de mariage</option>
                         <option value="Certificat de vie">Certificat de vie</option>
-                        <option value="Légalisation de document">Légalisation</option>
-                        <option value="Autre demande">Autre</option>
+                        <option value="Légalisation de document">Légalisation de document</option>
+                        <option value="Autre demande">Autre demande</option>
                     </select>
-                    <button class="btn btn-outline-secondary btn-sm" onclick="resetFiltres()" title="Réinitialiser">
-                        <i class="bi bi-x-circle"></i>
-                    </button>
+                </div>
+                <div class="mb-3">
+                    <label for="modifDescription" class="form-label-gov">Description</label>
+                    <textarea id="modifDescription" class="form-control-gov" rows="4"
+                              placeholder="Décrivez votre demande..."></textarea>
                 </div>
             </div>
-
-            <!-- LISTE DEMANDES -->
-            <div id="listeDemandes">
-                <div class="loading-state">
-                    <div class="spinner-border text-primary" role="status"></div>
-                    <p class="mt-3 text-muted">Chargement de vos demandes...</p>
-                </div>
-            </div>
-
-            <!-- PAGINATION -->
-            <nav id="pagination" class="pagination-wrap"></nav>
-
-        </main>
-    </div>
-
-    <!-- MODALE MODIFICATION -->
-    <div class="modal fade" id="modaleModif" tabindex="-1" aria-labelledby="modaleModifLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content modal-gov">
-                <div class="modal-header modal-header-gov">
-                    <h5 class="modal-title" id="modaleModifLabel">
-                        <i class="bi bi-pencil-fill me-2"></i>Modifier la demande
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <input type="hidden" id="modifId">
-                    <div class="mb-3">
-                        <label for="modifTitre" class="form-label-gov">Type de demande</label>
-                        <select id="modifTitre" class="form-select form-control-gov" title="Type de demande" aria-label="Type de demande">
-                            <option value="Certificat de résidence">Certificat de résidence</option>
-                            <option value="Acte de naissance">Acte de naissance</option>
-                            <option value="Acte de mariage">Acte de mariage</option>
-                            <option value="Certificat de vie">Certificat de vie</option>
-                            <option value="Légalisation de document">Légalisation de document</option>
-                            <option value="Autre demande">Autre demande</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="modifDescription" class="form-label-gov">Description</label>
-                        <textarea id="modifDescription" class="form-control form-control-gov" rows="4" placeholder="Description de la demande"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer modal-footer-gov">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="fermerModification()">Annuler</button>
-                    <button type="button" class="btn btn-gov" onclick="sauvegarderModification(event)">
-                        <i class="bi bi-check-lg me-1"></i>Sauvegarder
-                    </button>
-                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn-confirmer" onclick="sauvegarderModification(event)">
+                    <i class="bi bi-check-lg me-1"></i>Sauvegarder
+                </button>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- MODALE DÉTAIL -->
-    <div class="modal fade" id="modaleDetail" tabindex="-1" aria-labelledby="modaleDetailLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content modal-gov">
-                <div class="modal-header modal-header-gov">
-                    <h5 class="modal-title" id="modaleDetailLabel">
-                        <i class="bi bi-file-text-fill me-2"></i>Détail de la demande
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <div id="detailContenu"></div>
-                </div>
-                <div class="modal-footer modal-footer-gov">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="fermerDetail()">Fermer</button>
-                    <button type="button" class="btn btn-teal" onclick="imprimerDemande()">
-                        <i class="bi bi-printer-fill me-1"></i>Imprimer
-                    </button>
-                </div>
+<!-- MODALE DÉTAIL -->
+<div class="modal fade modal-gov" id="modaleDetail" tabindex="-1" aria-labelledby="modaleDetailLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modaleDetailLabel">
+                    <i class="bi bi-file-text-fill me-2"></i>Détail de la demande
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="detailContenu"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="button" class="btn-imprimer" onclick="imprimerDemande()">
+                    <i class="bi bi-printer-fill"></i>Imprimer
+                </button>
             </div>
         </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="script.js"></script>
+<script>
+// Surcharge des fonctions d'affichage pour utiliser les nouvelles classes CSS
+// Les fonctions de logique restent dans script.js
+
+// Remplacer les classes CSS des boutons dans afficherPage
+const _afficherPageOriginal = window.afficherPage;
+
+// Patch des classes CSS pour ce dashboard
+document.addEventListener("DOMContentLoaded", function() {
+    // Les styles sont déjà définis dans ce fichier
+    // script.js utilise des classes comme btn-voir-dem, btn-modif-dem, etc.
+    // On injecte un style de mapping pour compatibilité
+    const style = document.createElement("style");
+    style.textContent = `
+        .btn-voir-dem  { background:#F1F5F9;color:#0D1B2A;border:1px solid #E2E8F0;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;display:inline-flex;align-items:center;gap:5px; }
+        .btn-voir-dem:hover { background:#E2E8F0; }
+        .btn-modif-dem { background:#EFF6FF;color:#0B3D91;border:1px solid #BFDBFE;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;display:inline-flex;align-items:center;gap:5px; }
+        .btn-modif-dem:hover { background:#DBEAFE; }
+        .btn-suppr-dem { background:#FFF1F2;color:#BE123C;border:1px solid #FECDD3;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;display:inline-flex;align-items:center;gap:5px; }
+        .btn-suppr-dem:hover { background:#FFE4E6; }
+        .btn-print-dem { background:#F0FDF4;color:#15803D;border:1px solid #BBF7D0;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;display:inline-flex;align-items:center;gap:5px; }
+        .btn-print-dem:hover { background:#DCFCE7; }
+        .badge-statut-info { background:#F8FAFC;color:#94A3B8;border:1px solid #E2E8F0;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:5px; }
+        .reponse-admin { background:#EFF6FF;border-left:3px solid #0B3D91;border-radius:0 8px 8px 0;padding:10px 14px;font-size:13px;color:#0B3D91;margin-bottom:12px;display:flex;align-items:flex-start;gap:8px; }
+        .demande-card-actions { display:flex;gap:8px;flex-wrap:wrap; }
+        .demande-card-meta { font-size:12px;color:#94A3B8;margin-bottom:14px; }
+        .demande-card-desc { font-size:13px;color:#64748B;line-height:1.6;margin-bottom:12px; }
+        .demande-card-header { display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px; }
+        .demande-card-title { font-size:15px;font-weight:700;color:#0D1B2A;display:flex;align-items:center;gap:8px;margin:0; }
+        .demande-card { background:#fff;border-radius:14px;border:1px solid #E2E8F0;padding:20px 24px;margin-bottom:12px;transition:all .2s; }
+        .demande-card:hover { border-color:#C7D7F5;box-shadow:0 4px 16px rgba(11,61,145,.08); }
+        .detail-table { width:100%;border-collapse:collapse; }
+        .detail-table td { padding:10px 12px;border-bottom:1px solid #E2E8F0;font-size:14px; }
+        .detail-table td:first-child { font-weight:700;color:#64748B;width:140px; }
+        .empty-state { background:#fff;border-radius:16px;border:1px solid #E2E8F0;padding:60px 24px;text-align:center; }
+        .empty-state-icon { font-size:48px;color:#CBD5E1;margin-bottom:16px; }
+        .empty-state-title { font-size:18px;font-weight:700;color:#0D1B2A;margin-bottom:8px; }
+        .empty-state-desc { font-size:14px;color:#64748B;margin-bottom:24px; }
+        .btn-gov { background:#0B3D91;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all .2s; }
+        .btn-gov:hover { background:#1565C0; }
+        .btn-page { background:#fff;border:1.5px solid #E2E8F0;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;color:#374151;font-family:inherit; }
+        .btn-page:hover { border-color:#0B3D91;color:#0B3D91; }
+        .btn-page.active { background:#0B3D91;border-color:#0B3D91;color:#fff; }
+        .btn-page:disabled { opacity:.4;cursor:not-allowed; }
+        .pagination-wrap { display:flex;justify-content:center;gap:6px;margin-top:20px; }
+        .loading-state { background:#fff;border-radius:16px;border:1px solid #E2E8F0;padding:60px 24px;text-align:center;color:#64748B; }
+    `;
+    document.head.appendChild(style);
+});
+</script>
 </body>
 </html>
