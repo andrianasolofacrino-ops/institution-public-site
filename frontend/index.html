@@ -23,31 +23,17 @@
 
         /* NAVBAR */
         .navbar-gov {
-            background:var(--blanc);
-            border-bottom:3px solid var(--bleu);
-            padding:14px 0;
-            position:sticky; top:0; z-index:1000;
+            background:var(--blanc); border-bottom:3px solid var(--bleu);
+            padding:14px 0; position:sticky; top:0; z-index:1000;
             box-shadow:0 2px 16px rgba(11,61,145,.08);
         }
         .brand-gov { display:flex; align-items:center; gap:12px; text-decoration:none; }
-        .brand-logo {
-            width:42px; height:42px; background:var(--bleu); border-radius:10px;
-            display:flex; align-items:center; justify-content:center; color:#fff; font-size:20px;
-        }
+        .brand-logo { width:42px; height:42px; background:var(--bleu); border-radius:10px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:20px; }
         .brand-name { display:block; font-size:17px; font-weight:800; color:var(--bleu); line-height:1; }
         .brand-sub  { display:block; font-size:11px; font-weight:500; color:var(--gris); letter-spacing:.03em; }
-
-        .btn-gov {
-            background:var(--bleu); color:#fff !important; border:2px solid var(--bleu);
-            border-radius:8px; font-weight:700; padding:9px 20px; transition:all .2s;
-            text-decoration:none; display:inline-flex; align-items:center;
-        }
+        .btn-gov { background:var(--bleu); color:#fff !important; border:2px solid var(--bleu); border-radius:8px; font-weight:700; padding:9px 20px; transition:all .2s; text-decoration:none; display:inline-flex; align-items:center; }
         .btn-gov:hover { background:var(--bleu-vif); border-color:var(--bleu-vif); transform:translateY(-1px); box-shadow:0 4px 14px rgba(11,61,145,.3); }
-        .btn-outline-gov {
-            background:transparent; color:var(--bleu) !important; border:2px solid var(--bleu);
-            border-radius:8px; font-weight:700; padding:9px 20px; transition:all .2s;
-            text-decoration:none; display:inline-flex; align-items:center;
-        }
+        .btn-outline-gov { background:transparent; color:var(--bleu) !important; border:2px solid var(--bleu); border-radius:8px; font-weight:700; padding:9px 20px; transition:all .2s; text-decoration:none; display:inline-flex; align-items:center; }
         .btn-outline-gov:hover { background:var(--bleu-ciel); transform:translateY(-1px); }
 
         /* HERO */
@@ -69,7 +55,6 @@
         .hero-titre { font-size:clamp(2rem,5vw,3.2rem); font-weight:800; line-height:1.15; margin-bottom:20px; }
         .hero-titre span { color:var(--or); font-family:'Lora',serif; font-style:italic; }
         .hero-desc { font-size:17px; color:rgba(255,255,255,.85); line-height:1.7; max-width:500px; margin-bottom:36px; }
-
         .hero-btns { display:flex; flex-wrap:wrap; gap:14px; margin-bottom:48px; }
         .btn-hero-primary {
             background:var(--or); color:var(--texte) !important; border:2px solid var(--or);
@@ -82,70 +67,56 @@
             background:rgba(255,255,255,.12); color:#fff !important; border:2px solid rgba(255,255,255,.5);
             border-radius:10px; font-weight:700; font-size:16px; padding:14px 28px;
             text-decoration:none; display:inline-flex; align-items:center; gap:8px;
-            transition:all .25s;
-            -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px);
+            transition:all .25s; -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px);
         }
         .btn-hero-secondary:hover { background:rgba(255,255,255,.22); border-color:rgba(255,255,255,.8); transform:translateY(-2px); }
-
         .hero-stats { display:flex; gap:32px; flex-wrap:wrap; }
         .hero-stat-num { display:block; font-size:28px; font-weight:800; color:var(--or); line-height:1; }
         .hero-stat-lbl { display:block; font-size:12px; font-weight:500; color:rgba(255,255,255,.7); margin-top:2px; }
 
-        /* PREVIEW */
-        .hero-preview {
-            background:rgba(255,255,255,.12);
-            -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px);
-            border:1px solid rgba(255,255,255,.25); border-radius:20px;
-            padding:24px; box-shadow:0 20px 60px rgba(0,0,0,.25);
+        /* ── IMAGE MAIRIE ─────────────────────────── */
+        .hero-img-wrap {
+            position:relative;
+            border-radius:20px;
+            overflow:hidden;
+            box-shadow:0 24px 60px rgba(0,0,0,.4);
         }
-        .preview-dots { display:flex; gap:6px; margin-bottom:20px; }
-        .pdot { width:10px; height:10px; border-radius:50%; }
-        .pdot-r { background:#FF5F57; }
-        .pdot-y { background:#FFBD2E; }
-        .pdot-g { background:#28CA41; }
-        .preview-stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
-        .pstat { border-radius:10px; padding:14px 10px; text-align:center; }
-        .pstat-bleu   { background:rgba(255,255,255,.2); }
-        .pstat-jaune  { background:rgba(244,168,0,.25); }
-        .pstat-vert   { background:rgba(27,138,90,.25); }
-        .pstat-num { display:block; font-size:22px; font-weight:800; color:#fff; }
-        .pstat-lbl { display:block; font-size:11px; color:rgba(255,255,255,.7); }
-        .prow {
-            display:flex; align-items:center; gap:10px;
-            background:rgba(255,255,255,.1); border-radius:8px; padding:10px 12px; margin-bottom:8px;
+        .hero-img {
+            width:100%; height:380px;
+            object-fit:cover; object-position:center;
+            display:block; border-radius:20px;
+            transition:transform .4s ease;
         }
-        .prow-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-        .prow-dot-bleu  { background:#60A5FA; }
-        .prow-dot-vert  { background:#34D399; }
-        .prow-dot-ciel  { background:#93C5FD; }
-        .prow-lines { flex:1; }
-        .prow-line { height:6px; background:rgba(255,255,255,.3); border-radius:3px; margin-bottom:4px; }
-        .prow-line-long  { width:75%; }
-        .prow-line-short { width:45%; margin-bottom:0; }
-        .pbadge { font-size:10px; font-weight:700; padding:3px 9px; border-radius:20px; white-space:nowrap; }
-        .pbadge-attente { background:rgba(244,168,0,.3); color:#FFD966; }
-        .pbadge-termine { background:rgba(27,138,90,.3); color:#6EE7B7; }
-        .pbadge-cours   { background:rgba(255,255,255,.2); color:#BAE6FD; }
+        .hero-img-wrap:hover .hero-img { transform:scale(1.03); }
+
+        /* Badge sur l'image */
+        .hero-img-badge {
+            position:absolute; bottom:20px; left:20px;
+            background:rgba(11,61,145,.88);
+            -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
+            color:#fff; padding:10px 18px; border-radius:10px;
+            font-size:13px; font-weight:700;
+            border:1px solid rgba(255,255,255,.2);
+            display:flex; align-items:center; gap:8px;
+        }
+        .hero-img-badge i { color:var(--or); font-size:16px; }
+
+        /* Cadre décoratif */
+        .hero-img-frame {
+            position:absolute; top:-12px; right:-12px;
+            width:100%; height:100%; border-radius:20px;
+            border:2px solid rgba(244,168,0,.4);
+            z-index:-1;
+        }
 
         /* SERVICES */
         .section-services { padding:80px 0; background:var(--blanc); }
-        .section-tag {
-            display:inline-block; background:var(--bleu-ciel); color:var(--bleu);
-            font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
-            padding:5px 14px; border-radius:20px; margin-bottom:12px;
-        }
+        .section-tag { display:inline-block; background:var(--bleu-ciel); color:var(--bleu); font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:5px 14px; border-radius:20px; margin-bottom:12px; }
         .section-titre { font-size:clamp(1.6rem,3vw,2.4rem); font-weight:800; color:var(--texte); margin-bottom:10px; }
         .section-desc  { font-size:16px; color:var(--gris); }
-        .service-card {
-            background:var(--fond); border:1.5px solid #E2E8F0; border-radius:16px;
-            padding:28px 24px; transition:all .25s; height:100%;
-        }
+        .service-card { background:var(--fond); border:1.5px solid #E2E8F0; border-radius:16px; padding:28px 24px; transition:all .25s; height:100%; }
         .service-card:hover { border-color:var(--bleu); transform:translateY(-4px); box-shadow:0 12px 32px rgba(11,61,145,.12); }
-        .service-icone {
-            width:52px; height:52px; border-radius:12px;
-            display:flex; align-items:center; justify-content:center;
-            font-size:22px; margin-bottom:16px;
-        }
+        .service-icone { width:52px; height:52px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:16px; }
         .si-bleu   { background:#EFF6FF; color:#1D4ED8; }
         .si-teal   { background:#F0FDFA; color:#0F766E; }
         .si-violet { background:#F5F3FF; color:#7C3AED; }
@@ -157,35 +128,18 @@
 
         /* ÉTAPES */
         .section-etapes { padding:80px 0; background:var(--fond); }
-        .step-card {
-            background:var(--blanc); border:1.5px solid #E2E8F0; border-radius:16px;
-            padding:32px 24px; text-align:center; transition:all .25s; height:100%;
-        }
+        .step-card { background:var(--blanc); border:1.5px solid #E2E8F0; border-radius:16px; padding:32px 24px; text-align:center; transition:all .25s; height:100%; }
         .step-card-featured { background:var(--bleu); border-color:var(--bleu); color:#fff; }
         .step-card-featured .step-texte { color:rgba(255,255,255,.8); }
-        .step-num {
-            width:32px; height:32px; border-radius:50%;
-            background:var(--bleu-ciel); color:var(--bleu);
-            font-size:14px; font-weight:800;
-            display:flex; align-items:center; justify-content:center; margin:0 auto 20px;
-        }
+        .step-num { width:32px; height:32px; border-radius:50%; background:var(--bleu-ciel); color:var(--bleu); font-size:14px; font-weight:800; display:flex; align-items:center; justify-content:center; margin:0 auto 20px; }
         .step-card-featured .step-num { background:rgba(255,255,255,.2); color:#fff; }
-        .step-icone {
-            width:60px; height:60px; border-radius:16px;
-            background:var(--bleu-ciel); color:var(--bleu);
-            display:flex; align-items:center; justify-content:center;
-            font-size:26px; margin:0 auto 16px;
-        }
+        .step-icone { width:60px; height:60px; border-radius:16px; background:var(--bleu-ciel); color:var(--bleu); display:flex; align-items:center; justify-content:center; font-size:26px; margin:0 auto 16px; }
         .step-card-featured .step-icone { background:rgba(255,255,255,.2); color:#fff; }
         .step-titre { font-size:16px; font-weight:700; margin-bottom:8px; }
         .step-texte { font-size:13px; color:var(--gris); line-height:1.6; }
 
         /* CTA */
-        .section-cta {
-            padding:70px 0;
-            background:linear-gradient(135deg,var(--bleu) 0%,#1A237E 100%);
-            color:#fff; text-align:center;
-        }
+        .section-cta { padding:70px 0; background:linear-gradient(135deg,var(--bleu) 0%,#1A237E 100%); color:#fff; text-align:center; }
         .cta-titre { font-size:clamp(1.5rem,3vw,2.2rem); font-weight:800; margin-bottom:12px; }
         .cta-desc  { font-size:16px; color:rgba(255,255,255,.8); max-width:500px; margin:0 auto 36px; }
         .cta-btns  { display:flex; flex-wrap:wrap; gap:14px; justify-content:center; }
@@ -198,10 +152,7 @@
         .footer-link:hover { color:#fff; }
 
         /* ANIMATIONS */
-        @keyframes fadeUp {
-            from { opacity:0; transform:translateY(30px); }
-            to   { opacity:1; transform:translateY(0); }
-        }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
         .fade-up  { animation:fadeUp .7s ease both; }
         .delay-1  { animation-delay:.1s; }
         .delay-2  { animation-delay:.2s; }
@@ -260,6 +211,7 @@
 <section class="hero">
     <div class="container">
         <div class="row align-items-center g-5">
+
             <!-- Texte gauche -->
             <div class="col-lg-6">
                 <div class="hero-badge fade-up">
@@ -300,54 +252,23 @@
                     </div>
                 </div>
             </div>
-            <!-- Preview droite -->
+
+            <!-- ✅ IMAGE MAIRIE droite -->
             <div class="col-lg-6 d-none d-lg-block fade-up delay-2">
-                <div class="hero-preview">
-                    <div class="preview-dots">
-                        <div class="pdot pdot-r"></div>
-                        <div class="pdot pdot-y"></div>
-                        <div class="pdot pdot-g"></div>
-                    </div>
-                    <div class="preview-stats-row">
-                        <div class="pstat pstat-bleu">
-                            <span class="pstat-num">12</span>
-                            <span class="pstat-lbl">Total</span>
-                        </div>
-                        <div class="pstat pstat-jaune">
-                            <span class="pstat-num">5</span>
-                            <span class="pstat-lbl">En attente</span>
-                        </div>
-                        <div class="pstat pstat-vert">
-                            <span class="pstat-num">6</span>
-                            <span class="pstat-lbl">Terminées</span>
+                <div style="position:relative">
+                    <div class="hero-img-wrap">
+                        <img src="images/mairie-antananarivo.jpg"
+                             alt="Mairie d'Antananarivo — CommuneService"
+                             class="hero-img">
+                        <div class="hero-img-badge">
+                            <i class="bi bi-building-fill"></i>
+                            Commune d'Antananarivo — Madagascar
                         </div>
                     </div>
-                    <div class="prow">
-                        <div class="prow-dot prow-dot-bleu"></div>
-                        <div class="prow-lines">
-                            <div class="prow-line prow-line-long"></div>
-                            <div class="prow-line prow-line-short"></div>
-                        </div>
-                        <span class="pbadge pbadge-attente">En attente</span>
-                    </div>
-                    <div class="prow">
-                        <div class="prow-dot prow-dot-vert"></div>
-                        <div class="prow-lines">
-                            <div class="prow-line prow-line-long"></div>
-                            <div class="prow-line prow-line-short"></div>
-                        </div>
-                        <span class="pbadge pbadge-termine">Terminée</span>
-                    </div>
-                    <div class="prow">
-                        <div class="prow-dot prow-dot-ciel"></div>
-                        <div class="prow-lines">
-                            <div class="prow-line prow-line-long"></div>
-                            <div class="prow-line prow-line-short"></div>
-                        </div>
-                        <span class="pbadge pbadge-cours">En cours</span>
-                    </div>
+                    <div class="hero-img-frame"></div>
                 </div>
             </div>
+
         </div>
     </div>
 </section>
@@ -457,12 +378,10 @@
         <p class="cta-desc">Rejoignez les citoyens qui gèrent leurs demandes administratives en ligne, depuis chez eux.</p>
         <div class="cta-btns">
             <a href="register.html" class="btn-hero-primary">
-                <i class="bi bi-person-plus-fill"></i>
-                Créer un compte gratuit
+                <i class="bi bi-person-plus-fill"></i>Créer un compte gratuit
             </a>
             <a href="login.html" class="btn-hero-secondary">
-                <i class="bi bi-box-arrow-in-right"></i>
-                Se connecter
+                <i class="bi bi-box-arrow-in-right"></i>Se connecter
             </a>
         </div>
     </div>
