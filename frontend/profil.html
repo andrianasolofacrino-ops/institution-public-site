@@ -6,208 +6,276 @@
     <title>Mon profil — CommuneService</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Marianne:wght@400;500;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body class="page-app">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bleu:     #0B3D91;
+            --bleu-vif: #1565C0;
+            --vert:     #059669;
+            --or:       #F4A800;
+            --texte:    #0D1B2A;
+            --gris:     #64748B;
+            --fond:     #F1F5F9;
+            --blanc:    #FFFFFF;
+            --bordure:  #E2E8F0;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--fond); color:var(--texte); }
 
-    <header class="topbar">
-        <div class="topbar-brand">
-            <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Ouvrir le menu" title="Menu">
-                <i class="bi bi-list" aria-hidden="true"></i>
-            </button>
-            <a href="index.html" class="topbar-logo">
-                <i class="bi bi-building-fill me-2" aria-hidden="true"></i>
-                <span>CommuneService</span>
+        /* TOPBAR */
+        .topbar { position:sticky; top:0; z-index:100; background:var(--bleu); color:#fff; display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:56px; box-shadow:0 2px 12px rgba(0,0,0,.2); }
+        .topbar-brand { display:flex; align-items:center; gap:10px; }
+        .sidebar-toggle { background:none; border:none; color:#fff; font-size:22px; cursor:pointer; padding:4px 8px; border-radius:6px; display:none; }
+        .topbar-logo { display:flex; align-items:center; gap:8px; color:#fff; text-decoration:none; font-weight:700; font-size:16px; }
+        .user-wrap { position:relative; }
+        .user-btn { display:flex; align-items:center; gap:8px; cursor:pointer; padding:4px 8px; border-radius:8px; transition:background .2s; }
+        .user-btn:hover { background:rgba(255,255,255,.1); }
+        .user-avatar { width:32px; height:32px; border-radius:50%; background:var(--or); color:var(--texte); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px; }
+        .user-name { color:#fff; font-size:13px; font-weight:600; }
+        .user-menu { position:absolute; top:44px; right:0; background:#fff; border-radius:12px; box-shadow:0 8px 32px rgba(0,0,0,.15); min-width:190px; padding:8px 0; display:none; z-index:200; }
+        .user-menu.open { display:block; }
+        .user-menu-item { display:flex; align-items:center; gap:10px; padding:11px 16px; color:#374151; font-size:14px; text-decoration:none; transition:background .15s; background:none; border:none; width:100%; cursor:pointer; font-family:inherit; }
+        .user-menu-item:hover { background:#F3F4F6; }
+        .user-menu-logout { color:#DC2626; }
+        .user-menu-logout:hover { background:#FEF2F2; }
+        .user-menu-divider { height:1px; background:#E5E7EB; margin:4px 0; }
+
+        /* LAYOUT */
+        .app-layout { display:flex; min-height:calc(100vh - 56px); }
+        .sidebar { width:220px; flex-shrink:0; background:var(--blanc); border-right:1px solid var(--bordure); padding:20px 0; position:sticky; top:56px; height:calc(100vh - 56px); overflow-y:auto; }
+        .sidebar-section { font-size:10px; font-weight:700; color:#94A3B8; text-transform:uppercase; letter-spacing:.08em; padding:0 16px; margin:16px 0 6px; }
+        .sidebar-link { display:flex; align-items:center; gap:10px; padding:10px 16px; color:#475569; font-size:14px; font-weight:500; text-decoration:none; border-radius:8px; margin:2px 8px; transition:all .15s; background:none; border:none; width:calc(100% - 16px); cursor:pointer; font-family:inherit; }
+        .sidebar-link:hover { background:#F1F5F9; color:var(--bleu); }
+        .sidebar-link.active { background:#EFF6FF; color:var(--bleu); font-weight:700; }
+        .sidebar-logout { color:#DC2626; }
+        .sidebar-logout:hover { background:#FEF2F2; color:#B91C1C; }
+        .app-main { flex:1; padding:28px; }
+
+        /* PAGE HEADER */
+        .page-header { display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:28px; }
+        .page-title { font-size:24px; font-weight:800; color:var(--texte); margin:0; }
+        .page-subtitle { font-size:14px; color:var(--gris); margin:4px 0 0; }
+        .btn-retour { display:inline-flex; align-items:center; gap:6px; color:var(--gris); background:var(--blanc); border:1.5px solid var(--bordure); border-radius:8px; padding:9px 16px; font-size:13px; font-weight:600; text-decoration:none; transition:all .2s; }
+        .btn-retour:hover { border-color:#94A3B8; color:var(--texte); }
+
+        /* CARTE PROFIL */
+        .profil-card {
+            background:var(--blanc); border-radius:16px; border:1px solid var(--bordure);
+            overflow:hidden; text-align:center;
+        }
+        .profil-card-banner {
+            background:linear-gradient(135deg, var(--bleu) 0%, #1A237E 100%);
+            height:80px; position:relative;
+        }
+        .profil-avatar-wrap {
+            position:relative; display:inline-block;
+            margin-top:-36px; margin-bottom:12px;
+        }
+        .profil-avatar-big {
+            width:72px; height:72px; border-radius:50%;
+            background:var(--or); color:var(--texte);
+            display:flex; align-items:center; justify-content:center;
+            font-size:28px; font-weight:800;
+            border:4px solid var(--blanc);
+            box-shadow:0 4px 16px rgba(0,0,0,.15);
+        }
+        .profil-card-body { padding:0 24px 24px; }
+        .profil-nom-big   { font-size:18px; font-weight:800; color:var(--texte); margin-bottom:4px; }
+        .profil-email-big { font-size:13px; color:var(--gris); margin-bottom:16px; }
+        .profil-badge {
+            display:inline-flex; align-items:center; gap:6px;
+            background:#F0FDF4; color:var(--vert); border:1px solid #BBF7D0;
+            border-radius:20px; padding:5px 14px; font-size:12px; font-weight:700;
+        }
+        .profil-stats { display:flex; gap:0; border-top:1px solid var(--bordure); margin-top:20px; }
+        .profil-stat { flex:1; padding:14px 8px; text-align:center; }
+        .profil-stat + .profil-stat { border-left:1px solid var(--bordure); }
+        .profil-stat-num { font-size:20px; font-weight:800; color:var(--bleu); }
+        .profil-stat-lbl { font-size:11px; color:var(--gris); margin-top:2px; }
+
+        /* SECTIONS FORMULAIRE */
+        .form-section {
+            background:var(--blanc); border-radius:16px; border:1px solid var(--bordure);
+            overflow:hidden; margin-bottom:16px;
+        }
+        .form-section-header {
+            background:#F8FAFC; border-bottom:1px solid var(--bordure);
+            padding:14px 24px; font-size:14px; font-weight:700; color:var(--texte);
+            display:flex; align-items:center; gap:8px;
+        }
+        .form-section-header i { color:var(--bleu); font-size:16px; }
+        .form-section-body { padding:24px; }
+
+        /* INPUTS */
+        .form-label-gov { display:block; font-size:13px; font-weight:700; color:#374151; margin-bottom:6px; }
+        .form-control-gov { width:100%; border:1.5px solid var(--bordure); border-radius:10px; padding:12px 14px; font-size:14px; font-family:inherit; transition:border-color .2s; background:var(--blanc); color:var(--texte); }
+        .form-control-gov:focus { outline:none; border-color:var(--bleu); box-shadow:0 0 0 3px rgba(11,61,145,.1); }
+        .form-group { margin-bottom:16px; }
+        .pwd-wrap { position:relative; }
+        .pwd-toggle { position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--gris); cursor:pointer; font-size:16px; transition:color .2s; }
+        .pwd-toggle:hover { color:var(--bleu); }
+
+        /* BOUTONS */
+        .btn-sauvegarder { background:var(--bleu); color:#fff; border:none; border-radius:8px; padding:11px 22px; font-size:14px; font-weight:700; font-family:inherit; cursor:pointer; transition:all .2s; display:inline-flex; align-items:center; gap:6px; }
+        .btn-sauvegarder:hover { background:var(--bleu-vif); transform:translateY(-1px); }
+        .btn-mdp { background:var(--vert); color:#fff; border:none; border-radius:8px; padding:11px 22px; font-size:14px; font-weight:700; font-family:inherit; cursor:pointer; transition:all .2s; display:inline-flex; align-items:center; gap:6px; }
+        .btn-mdp:hover { background:#047857; transform:translateY(-1px); }
+
+        /* RESPONSIVE */
+        @media (max-width:991px) {
+            .sidebar { display:none; }
+            .sidebar.open { display:block; position:fixed; top:56px; left:0; z-index:50; height:calc(100vh - 56px); box-shadow:4px 0 20px rgba(0,0,0,.15); }
+            .sidebar-toggle { display:block; }
+            .app-main { padding:16px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+    <div class="topbar-brand">
+        <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
+        <a href="index.html" class="topbar-logo">
+            <i class="bi bi-building-fill"></i><span>CommuneService</span>
+        </a>
+    </div>
+    <div class="topbar-actions">
+        <div class="user-wrap">
+            <div class="user-btn" onclick="toggleUserMenu()">
+                <div class="user-avatar" id="topbarAvatar">?</div>
+                <span class="user-name d-none d-md-inline" id="nomUtilisateur">...</span>
+                <i class="bi bi-chevron-down" style="color:#fff;font-size:12px"></i>
+            </div>
+            <div class="user-menu" id="userMenu">
+                <a href="profil.html" class="user-menu-item"><i class="bi bi-person-circle"></i>Mon profil</a>
+                <div class="user-menu-divider"></div>
+                <button onclick="logout()" class="user-menu-item user-menu-logout"><i class="bi bi-box-arrow-right"></i>Se déconnecter</button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-section">Principal</div>
+        <a href="dashboard.html" class="sidebar-link"><i class="bi bi-grid-fill"></i><span>Tableau de bord</span></a>
+        <a href="demande.html" class="sidebar-link"><i class="bi bi-file-earmark-plus-fill"></i><span>Nouvelle demande</span></a>
+        <div class="sidebar-section" style="margin-top:16px">Mon compte</div>
+        <a href="profil.html" class="sidebar-link active"><i class="bi bi-person-circle"></i><span>Mon profil</span></a>
+        <button onclick="logout()" class="sidebar-link sidebar-logout"><i class="bi bi-box-arrow-right"></i><span>Se déconnecter</span></button>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="app-main">
+
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Mon profil</h1>
+                <p class="page-subtitle">Gérez vos informations personnelles</p>
+            </div>
+            <a href="dashboard.html" class="btn-retour">
+                <i class="bi bi-arrow-left"></i>Retour
             </a>
         </div>
-        <div class="topbar-actions">
-            <div class="topbar-user" onclick="toggleUserMenu()">
-                <div class="user-avatar" id="topbarAvatar" aria-hidden="true">?</div>
-                <span class="user-name d-none d-md-inline" id="nomUtilisateur">...</span>
-                <i class="bi bi-chevron-down ms-1 chevron-user" aria-hidden="true"></i>
-                <div class="user-menu" id="userMenu">
-                    <a href="profil.html" class="user-menu-item">
-                        <i class="bi bi-person-circle" aria-hidden="true"></i>Mon profil
-                    </a>
-                    <div class="user-menu-divider"></div>
-                    <button onclick="logout()" class="user-menu-item user-menu-logout" aria-label="Se déconnecter" title="Se déconnecter">
-                        <i class="bi bi-box-arrow-right" aria-hidden="true"></i>Se déconnecter
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
 
-    <div class="app-layout">
-        <aside class="sidebar" id="sidebar">
-            <nav class="sidebar-nav" aria-label="Navigation principale">
-                <div class="sidebar-section-label">Principal</div>
-                <a href="dashboard.html" class="sidebar-link">
-                    <i class="bi bi-grid-fill" aria-hidden="true"></i><span>Tableau de bord</span>
-                </a>
-                <a href="demande.html" class="sidebar-link">
-                    <i class="bi bi-file-earmark-plus-fill" aria-hidden="true"></i><span>Nouvelle demande</span>
-                </a>
-                <div class="sidebar-section-label mt-3">Mon compte</div>
-                <a href="profil.html" class="sidebar-link active">
-                    <i class="bi bi-person-circle" aria-hidden="true"></i><span>Mon profil</span>
-                </a>
-                <button onclick="logout()" class="sidebar-link sidebar-logout" aria-label="Se déconnecter" title="Se déconnecter">
-                    <i class="bi bi-box-arrow-right" aria-hidden="true"></i><span>Se déconnecter</span>
-                </button>
-            </nav>
-        </aside>
+        <div class="row g-4">
 
-        <main class="app-main">
-
-            <div class="page-header">
-                <div>
-                    <h1 class="page-title">Mon profil</h1>
-                    <p class="page-subtitle">Gérez vos informations personnelles</p>
-                </div>
-                <a href="dashboard.html" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Retour
-                </a>
-            </div>
-
-            <div class="row g-4">
-
-                <!-- COLONNE GAUCHE — avatar + infos -->
-                <div class="col-lg-4">
-                    <div class="profil-card">
-                        <div class="profil-card-header">
-                            <div class="profil-avatar" id="avatarInitiales" aria-hidden="true">?</div>
-                            <div class="profil-nom" id="profilNom">Chargement...</div>
-                            <div class="profil-email-text" id="profilEmail"></div>
+            <!-- COLONNE GAUCHE -->
+            <div class="col-lg-4">
+                <div class="profil-card">
+                    <div class="profil-card-banner"></div>
+                    <div class="profil-card-body">
+                        <div class="profil-avatar-wrap">
+                            <div class="profil-avatar-big" id="avatarInitiales">?</div>
                         </div>
-                        <div class="p-3">
-                            <div class="profil-status-box">
-                                <i class="bi bi-shield-check-fill text-success" aria-hidden="true"></i>
-                                <div>
-                                    <div class="profil-status-title">Compte actif</div>
-                                    <div class="profil-status-sub">Citoyen inscrit</div>
-                                </div>
-                            </div>
+                        <div class="profil-nom-big" id="profilNom">Chargement...</div>
+                        <div class="profil-email-big" id="profilEmail"></div>
+                        <div class="profil-badge">
+                            <i class="bi bi-shield-check-fill"></i>Compte actif
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- COLONNE DROITE — formulaires -->
-                <div class="col-lg-8">
+            <!-- COLONNE DROITE -->
+            <div class="col-lg-8">
 
-                    <div id="msgProfil" class="alert d-none mb-3" role="alert"></div>
-
-                    <!-- Modifier nom -->
-                    <div class="profil-section-card mb-4">
-                        <div class="profil-section-header">
-                            <i class="bi bi-person-fill" aria-hidden="true"></i>
-                            Modifier le nom
-                        </div>
-                        <div class="profil-section-body">
-                            <form onsubmit="modifierNom(event)" novalidate>
+                <!-- MODIFIER NOM -->
+                <div class="form-section">
+                    <div class="form-section-header">
+                        <i class="bi bi-person-fill"></i>Modifier le nom
+                    </div>
+                    <div class="form-section-body">
+                        <form onsubmit="modifierNom(event)" novalidate>
+                            <div class="form-group">
                                 <label for="nouveauNom" class="form-label-gov">Nouveau nom complet</label>
-                                <input
-                                    type="text"
-                                    id="nouveauNom"
-                                    class="form-control form-control-gov"
-                                    placeholder="Votre nom complet"
-                                    required>
-                                <div class="mt-3">
-                                    <button type="submit" class="btn btn-gov">
-                                        <i class="bi bi-check-lg me-1" aria-hidden="true"></i>
-                                        Sauvegarder le nom
+                                <input type="text" id="nouveauNom" class="form-control-gov"
+                                       placeholder="Votre nom complet" required>
+                            </div>
+                            <button type="submit" class="btn-sauvegarder">
+                                <i class="bi bi-check-lg"></i>Sauvegarder
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- CHANGER MOT DE PASSE -->
+                <div class="form-section">
+                    <div class="form-section-header">
+                        <i class="bi bi-key-fill"></i>Changer le mot de passe
+                    </div>
+                    <div class="form-section-body">
+                        <form onsubmit="changerMotDePasse(event)" novalidate>
+                            <div class="form-group">
+                                <label for="ancienMdp" class="form-label-gov">Mot de passe actuel</label>
+                                <div class="pwd-wrap">
+                                    <input type="password" id="ancienMdp" class="form-control-gov"
+                                           placeholder="Mot de passe actuel" required
+                                           style="padding-right:44px">
+                                    <button type="button" class="pwd-toggle" onclick="togglePassword('ancienMdp', this)">
+                                        <i class="bi bi-eye-fill"></i>
                                     </button>
                                 </div>
-                            </form>
-                        </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="nouveauMdp" class="form-label-gov">Nouveau mot de passe</label>
+                                <div class="pwd-wrap">
+                                    <input type="password" id="nouveauMdp" class="form-control-gov"
+                                           placeholder="Minimum 4 caractères" required minlength="4"
+                                           style="padding-right:44px">
+                                    <button type="button" class="pwd-toggle" onclick="togglePassword('nouveauMdp', this)">
+                                        <i class="bi bi-eye-fill"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="confirmMdp" class="form-label-gov">Confirmer le nouveau mot de passe</label>
+                                <div class="pwd-wrap">
+                                    <input type="password" id="confirmMdp" class="form-control-gov"
+                                           placeholder="Confirmer le mot de passe" required
+                                           style="padding-right:44px">
+                                    <button type="button" class="pwd-toggle" onclick="togglePassword('confirmMdp', this)">
+                                        <i class="bi bi-eye-fill"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-mdp">
+                                <i class="bi bi-shield-lock-fill"></i>Changer le mot de passe
+                            </button>
+                        </form>
                     </div>
-
-                    <!-- Changer mot de passe -->
-                    <div class="profil-section-card">
-                        <div class="profil-section-header">
-                            <i class="bi bi-key-fill" aria-hidden="true"></i>
-                            Changer le mot de passe
-                        </div>
-                        <div class="profil-section-body">
-                            <form onsubmit="changerMotDePasse(event)" novalidate>
-
-                                <div class="mb-3">
-                                    <label for="ancienMdp" class="form-label-gov">Mot de passe actuel</label>
-                                    <div class="input-password-wrap">
-                                        <input
-                                            type="password"
-                                            id="ancienMdp"
-                                            class="form-control form-control-gov"
-                                            placeholder="Mot de passe actuel"
-                                            required>
-                                        <button
-                                            type="button"
-                                            class="btn-toggle-pwd"
-                                            onclick="togglePassword('ancienMdp', this)"
-                                            aria-label="Afficher le mot de passe actuel"
-                                            title="Afficher/Masquer">
-                                            <i class="bi bi-eye-fill" aria-hidden="true"></i>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="nouveauMdp" class="form-label-gov">Nouveau mot de passe</label>
-                                    <div class="input-password-wrap">
-                                        <input
-                                            type="password"
-                                            id="nouveauMdp"
-                                            class="form-control form-control-gov"
-                                            placeholder="Nouveau mot de passe (min. 4 caractères)"
-                                            required
-                                            minlength="4">
-                                        <button
-                                            type="button"
-                                            class="btn-toggle-pwd"
-                                            onclick="togglePassword('nouveauMdp', this)"
-                                            aria-label="Afficher le nouveau mot de passe"
-                                            title="Afficher/Masquer">
-                                            <i class="bi bi-eye-fill" aria-hidden="true"></i>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div class="mb-4">
-                                    <label for="confirmMdp" class="form-label-gov">Confirmer le nouveau mot de passe</label>
-                                    <div class="input-password-wrap">
-                                        <input
-                                            type="password"
-                                            id="confirmMdp"
-                                            class="form-control form-control-gov"
-                                            placeholder="Confirmer le mot de passe"
-                                            required>
-                                        <button
-                                            type="button"
-                                            class="btn-toggle-pwd"
-                                            onclick="togglePassword('confirmMdp', this)"
-                                            aria-label="Afficher la confirmation"
-                                            title="Afficher/Masquer">
-                                            <i class="bi bi-eye-fill" aria-hidden="true"></i>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <button type="submit" class="btn btn-gov-green">
-                                    <i class="bi bi-shield-lock-fill me-1" aria-hidden="true"></i>
-                                    Changer le mot de passe
-                                </button>
-
-                            </form>
-                        </div>
-                    </div>
-
                 </div>
-            </div>
-        </main>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="script.js"></script>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
