@@ -23,91 +23,79 @@
 
         /* NAVBAR */
         .navbar-gov {
-            background:var(--blanc); border-bottom:3px solid var(--bleu);
+            background:rgba(11,61,145,.95);
+            -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px);
+            border-bottom:2px solid rgba(244,168,0,.4);
             padding:14px 0; position:sticky; top:0; z-index:1000;
-            box-shadow:0 2px 16px rgba(11,61,145,.08);
+            box-shadow:0 2px 20px rgba(0,0,0,.25);
         }
         .brand-gov { display:flex; align-items:center; gap:12px; text-decoration:none; }
-        .brand-logo { width:42px; height:42px; background:var(--bleu); border-radius:10px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:20px; }
-        .brand-name { display:block; font-size:17px; font-weight:800; color:var(--bleu); line-height:1; }
-        .brand-sub  { display:block; font-size:11px; font-weight:500; color:var(--gris); letter-spacing:.03em; }
-        .btn-gov { background:var(--bleu); color:#fff !important; border:2px solid var(--bleu); border-radius:8px; font-weight:700; padding:9px 20px; transition:all .2s; text-decoration:none; display:inline-flex; align-items:center; }
-        .btn-gov:hover { background:var(--bleu-vif); border-color:var(--bleu-vif); transform:translateY(-1px); box-shadow:0 4px 14px rgba(11,61,145,.3); }
-        .btn-outline-gov { background:transparent; color:var(--bleu) !important; border:2px solid var(--bleu); border-radius:8px; font-weight:700; padding:9px 20px; transition:all .2s; text-decoration:none; display:inline-flex; align-items:center; }
-        .btn-outline-gov:hover { background:var(--bleu-ciel); transform:translateY(-1px); }
+        .brand-logo { width:42px; height:42px; background:var(--or); border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--texte); font-size:20px; }
+        .brand-name { display:block; font-size:17px; font-weight:800; color:#fff; line-height:1; }
+        .brand-sub  { display:block; font-size:11px; font-weight:500; color:rgba(255,255,255,.7); letter-spacing:.03em; }
+        .btn-gov { background:var(--or); color:var(--texte) !important; border:2px solid var(--or); border-radius:8px; font-weight:700; padding:9px 20px; transition:all .2s; text-decoration:none; display:inline-flex; align-items:center; }
+        .btn-gov:hover { background:#E69900; transform:translateY(-1px); }
+        .btn-outline-gov { background:rgba(255,255,255,.12); color:#fff !important; border:2px solid rgba(255,255,255,.5); border-radius:8px; font-weight:700; padding:9px 20px; transition:all .2s; text-decoration:none; display:inline-flex; align-items:center; }
+        .btn-outline-gov:hover { background:rgba(255,255,255,.22); transform:translateY(-1px); }
+        .nav-link-gov { color:rgba(255,255,255,.9) !important; font-weight:600; }
 
         /* HERO */
-        .hero {
-            background:linear-gradient(135deg,var(--bleu) 0%,#1A237E 60%,#0D47A1 100%);
-            color:#fff; padding:80px 0 60px; position:relative; overflow:hidden;
+        .hero { position:relative; min-height:100vh; display:flex; align-items:center; overflow:hidden; }
+
+        /* Image fond — Baie de Diego Suarez */
+        .hero-bg {
+            position:absolute; inset:0;
+            background-image:url('images/diego-suarez.jpg');
+            background-size:cover; background-position:center;
+            z-index:0; transition:transform 10s ease;
         }
-        .hero::before {
-            content:''; position:absolute; inset:0;
-            background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");
+        .hero:hover .hero-bg { transform:scale(1.04); }
+
+        /* Overlay dégradé */
+        .hero-overlay {
+            position:absolute; inset:0; z-index:1;
+            background:linear-gradient(135deg,
+                rgba(11,61,145,.90) 0%,
+                rgba(11,61,145,.78) 45%,
+                rgba(11,61,145,.55) 75%,
+                rgba(11,61,145,.35) 100%
+            );
         }
-        .hero-badge {
-            display:inline-flex; align-items:center;
-            background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.3);
-            border-radius:50px; padding:6px 16px; font-size:13px; font-weight:600;
-            color:#fff; margin-bottom:24px;
-            -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px);
+        .hero-pattern {
+            position:absolute; inset:0; z-index:2;
+            background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");
         }
-        .hero-titre { font-size:clamp(2rem,5vw,3.2rem); font-weight:800; line-height:1.15; margin-bottom:20px; }
+        .hero-content { position:relative; z-index:3; width:100%; padding:80px 0 60px; }
+
+        /* Badges */
+        .hero-badge { display:inline-flex; align-items:center; background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.35); border-radius:50px; padding:6px 16px; font-size:13px; font-weight:600; color:#fff; -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); }
+        .hero-badge-or { display:inline-flex; align-items:center; background:rgba(244,168,0,.25); border:1px solid rgba(244,168,0,.5); border-radius:50px; padding:5px 14px; font-size:12px; font-weight:700; color:var(--or); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); }
+
+        .hero-titre { font-size:clamp(2.2rem,5.5vw,3.8rem); font-weight:800; line-height:1.1; margin-bottom:20px; color:#fff; }
         .hero-titre span { color:var(--or); font-family:'Lora',serif; font-style:italic; }
-        .hero-desc { font-size:17px; color:rgba(255,255,255,.85); line-height:1.7; max-width:500px; margin-bottom:36px; }
+        .hero-desc { font-size:17px; color:rgba(255,255,255,.9); line-height:1.8; max-width:540px; margin-bottom:36px; text-shadow:0 1px 8px rgba(0,0,0,.3); }
+
         .hero-btns { display:flex; flex-wrap:wrap; gap:14px; margin-bottom:48px; }
-        .btn-hero-primary {
-            background:var(--or); color:var(--texte) !important; border:2px solid var(--or);
-            border-radius:10px; font-weight:800; font-size:16px; padding:14px 28px;
-            text-decoration:none; display:inline-flex; align-items:center; gap:8px;
-            transition:all .25s; box-shadow:0 4px 20px rgba(244,168,0,.4);
-        }
-        .btn-hero-primary:hover { background:#E69900; border-color:#E69900; transform:translateY(-2px); box-shadow:0 8px 28px rgba(244,168,0,.5); }
-        .btn-hero-secondary {
-            background:rgba(255,255,255,.12); color:#fff !important; border:2px solid rgba(255,255,255,.5);
-            border-radius:10px; font-weight:700; font-size:16px; padding:14px 28px;
-            text-decoration:none; display:inline-flex; align-items:center; gap:8px;
-            transition:all .25s; -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px);
-        }
-        .btn-hero-secondary:hover { background:rgba(255,255,255,.22); border-color:rgba(255,255,255,.8); transform:translateY(-2px); }
+        .btn-hero-primary { background:var(--or); color:var(--texte) !important; border:2px solid var(--or); border-radius:10px; font-weight:800; font-size:16px; padding:14px 28px; text-decoration:none; display:inline-flex; align-items:center; gap:8px; transition:all .25s; box-shadow:0 4px 20px rgba(244,168,0,.5); }
+        .btn-hero-primary:hover { background:#E69900; transform:translateY(-2px); box-shadow:0 8px 28px rgba(244,168,0,.6); }
+        .btn-hero-secondary { background:rgba(255,255,255,.15); color:#fff !important; border:2px solid rgba(255,255,255,.5); border-radius:10px; font-weight:700; font-size:16px; padding:14px 28px; text-decoration:none; display:inline-flex; align-items:center; gap:8px; transition:all .25s; -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); }
+        .btn-hero-secondary:hover { background:rgba(255,255,255,.25); border-color:rgba(255,255,255,.9); transform:translateY(-2px); }
+
         .hero-stats { display:flex; gap:32px; flex-wrap:wrap; }
         .hero-stat-num { display:block; font-size:28px; font-weight:800; color:var(--or); line-height:1; }
-        .hero-stat-lbl { display:block; font-size:12px; font-weight:500; color:rgba(255,255,255,.7); margin-top:2px; }
+        .hero-stat-lbl { display:block; font-size:12px; font-weight:500; color:rgba(255,255,255,.8); margin-top:2px; }
 
-        /* ── IMAGE MAIRIE ─────────────────────────── */
-        .hero-img-wrap {
-            position:relative;
-            border-radius:20px;
-            overflow:hidden;
-            box-shadow:0 24px 60px rgba(0,0,0,.4);
-        }
-        .hero-img {
-            width:100%; height:380px;
-            object-fit:cover; object-position:center;
-            display:block; border-radius:20px;
-            transition:transform .4s ease;
-        }
+        /* Image mairie droite */
+        .hero-img-wrap { border-radius:20px; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.5); position:relative; }
+        .hero-img { width:100%; height:380px; object-fit:cover; object-position:center; display:block; transition:transform .4s ease; }
         .hero-img-wrap:hover .hero-img { transform:scale(1.03); }
+        .hero-img-badge { position:absolute; bottom:20px; left:20px; background:rgba(11,61,145,.88); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); color:#fff; padding:10px 18px; border-radius:10px; font-size:13px; font-weight:700; border:1px solid rgba(255,255,255,.2); display:flex; align-items:center; gap:8px; }
+        .hero-img-badge i { color:var(--or); }
+        .hero-img-frame { position:absolute; top:-12px; right:-12px; width:100%; height:100%; border-radius:20px; border:2px solid rgba(244,168,0,.4); z-index:-1; }
 
-        /* Badge sur l'image */
-        .hero-img-badge {
-            position:absolute; bottom:20px; left:20px;
-            background:rgba(11,61,145,.88);
-            -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
-            color:#fff; padding:10px 18px; border-radius:10px;
-            font-size:13px; font-weight:700;
-            border:1px solid rgba(255,255,255,.2);
-            display:flex; align-items:center; gap:8px;
-        }
-        .hero-img-badge i { color:var(--or); font-size:16px; }
-
-        /* Cadre décoratif */
-        .hero-img-frame {
-            position:absolute; top:-12px; right:-12px;
-            width:100%; height:100%; border-radius:20px;
-            border:2px solid rgba(244,168,0,.4);
-            z-index:-1;
-        }
+        /* Badge localisation bas */
+        .hero-location { position:absolute; bottom:24px; left:50%; transform:translateX(-50%); z-index:3; background:rgba(11,61,145,.8); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); border:1px solid rgba(244,168,0,.4); border-radius:12px; padding:10px 22px; display:flex; align-items:center; gap:8px; color:#fff; font-size:13px; font-weight:700; white-space:nowrap; }
+        .hero-location i { color:var(--or); }
 
         /* SERVICES */
         .section-services { padding:80px 0; background:var(--blanc); }
@@ -128,7 +116,7 @@
 
         /* ÉTAPES */
         .section-etapes { padding:80px 0; background:var(--fond); }
-        .step-card { background:var(--blanc); border:1.5px solid #E2E8F0; border-radius:16px; padding:32px 24px; text-align:center; transition:all .25s; height:100%; }
+        .step-card { background:var(--blanc); border:1.5px solid #E2E8F0; border-radius:16px; padding:32px 24px; text-align:center; height:100%; }
         .step-card-featured { background:var(--bleu); border-color:var(--bleu); color:#fff; }
         .step-card-featured .step-texte { color:rgba(255,255,255,.8); }
         .step-num { width:32px; height:32px; border-radius:50%; background:var(--bleu-ciel); color:var(--bleu); font-size:14px; font-weight:800; display:flex; align-items:center; justify-content:center; margin:0 auto 20px; }
@@ -153,19 +141,23 @@
 
         /* ANIMATIONS */
         @keyframes fadeUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
-        .fade-up  { animation:fadeUp .7s ease both; }
-        .delay-1  { animation-delay:.1s; }
-        .delay-2  { animation-delay:.2s; }
-        .delay-3  { animation-delay:.3s; }
-        .delay-4  { animation-delay:.4s; }
+        .fade-up  { animation:fadeUp .8s ease both; }
+        .delay-1  { animation-delay:.15s; }
+        .delay-2  { animation-delay:.3s; }
+        .delay-3  { animation-delay:.45s; }
+        .delay-4  { animation-delay:.6s; }
 
         /* RESPONSIVE */
+        @media (max-width:991px) {
+            .hero-content { padding:60px 0 40px; }
+            .hero { min-height:auto; }
+        }
         @media (max-width:768px) {
-            .hero { padding:50px 0 40px; }
             .hero-btns { flex-direction:column; }
             .btn-hero-primary, .btn-hero-secondary { justify-content:center; }
             .hero-stats { gap:20px; }
             .cta-btns { flex-direction:column; align-items:center; }
+            .hero-location { display:none; }
         }
     </style>
 </head>
@@ -188,7 +180,7 @@
         <div class="collapse navbar-collapse" id="navMain">
             <ul class="navbar-nav ms-auto align-items-center gap-2">
                 <li class="nav-item">
-                    <a class="nav-link" style="color:var(--bleu);font-weight:600" href="index.html">
+                    <a class="nav-link nav-link-gov" href="index.html">
                         <i class="bi bi-house me-1"></i>Accueil
                     </a>
                 </li>
@@ -209,67 +201,86 @@
 
 <!-- HERO -->
 <section class="hero">
-    <div class="container">
-        <div class="row align-items-center g-5">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-pattern"></div>
 
-            <!-- Texte gauche -->
-            <div class="col-lg-6">
-                <div class="hero-badge fade-up">
-                    <i class="bi bi-shield-check-fill me-2"></i>
-                    Service public officiel — Commune de Madagascar
-                </div>
-                <h1 class="hero-titre fade-up delay-1">
-                    Vos démarches<br>
-                    <span>administratives</span><br>
-                    en ligne
-                </h1>
-                <p class="hero-desc fade-up delay-2">
-                    Soumettez et suivez vos demandes administratives depuis chez vous.
-                    Plus besoin de files d'attente pour obtenir vos documents officiels.
-                </p>
-                <div class="hero-btns fade-up delay-3">
-                    <a href="register.html" class="btn-hero-primary">
-                        <i class="bi bi-person-plus-fill"></i>
-                        Commencer maintenant
-                    </a>
-                    <a href="login.html" class="btn-hero-secondary">
-                        <i class="bi bi-box-arrow-in-right"></i>
-                        Se connecter
-                    </a>
-                </div>
-                <div class="hero-stats fade-up delay-4">
-                    <div>
-                        <span class="hero-stat-num">6</span>
-                        <span class="hero-stat-lbl">Types de demandes</span>
-                    </div>
-                    <div>
-                        <span class="hero-stat-num">100%</span>
-                        <span class="hero-stat-lbl">En ligne</span>
-                    </div>
-                    <div>
-                        <span class="hero-stat-num">24/7</span>
-                        <span class="hero-stat-lbl">Disponible</span>
-                    </div>
-                </div>
-            </div>
+    <div class="hero-content">
+        <div class="container">
+            <div class="row align-items-center g-5">
 
-            <!-- ✅ IMAGE MAIRIE droite -->
-            <div class="col-lg-6 d-none d-lg-block fade-up delay-2">
-                <div style="position:relative">
-                    <div class="hero-img-wrap">
-                        <img src="images/mairie-antsiranana.jpg"
-                             alt="Mairie d'Antsiranana (Diego Suarez) — CommuneService"
-                             class="hero-img">
-                        <div class="hero-img-badge">
-                            <i class="bi bi-building-fill"></i>
-                             Commune d'Antsiranana (Diego Suarez) — Madagascar
+                <!-- Texte gauche -->
+                <div class="col-lg-6">
+                    <div class="d-flex align-items-center flex-wrap gap-2 mb-3">
+                        <div class="hero-badge fade-up">
+                            <i class="bi bi-shield-check-fill me-2"></i>
+                            Service public officiel — République de Madagascar
+                        </div>
+                        <div class="hero-badge-or fade-up">
+                            <i class="bi bi-geo-alt-fill me-1"></i>
+                            Antsiranana · Diego Suarez
                         </div>
                     </div>
-                    <div class="hero-img-frame"></div>
+                    <h1 class="hero-titre fade-up delay-1">
+                        Vos démarches<br>
+                        <span>administratives</span><br>
+                        en ligne
+                    </h1>
+                    <p class="hero-desc fade-up delay-2">
+                        Soumettez et suivez vos demandes administratives depuis chez vous.
+                        Plus besoin de files d'attente pour obtenir vos documents officiels
+                        à Antsiranana.
+                    </p>
+                    <div class="hero-btns fade-up delay-3">
+                        <a href="register.html" class="btn-hero-primary">
+                            <i class="bi bi-person-plus-fill"></i>
+                            Commencer maintenant
+                        </a>
+                        <a href="login.html" class="btn-hero-secondary">
+                            <i class="bi bi-box-arrow-in-right"></i>
+                            Se connecter
+                        </a>
+                    </div>
+                    <div class="hero-stats fade-up delay-4">
+                        <div>
+                            <span class="hero-stat-num">6</span>
+                            <span class="hero-stat-lbl">Types de demandes</span>
+                        </div>
+                        <div>
+                            <span class="hero-stat-num">100%</span>
+                            <span class="hero-stat-lbl">En ligne</span>
+                        </div>
+                        <div>
+                            <span class="hero-stat-num">24/7</span>
+                            <span class="hero-stat-lbl">Disponible</span>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
+                <!-- Image mairie droite -->
+                <div class="col-lg-6 d-none d-lg-block fade-up delay-2">
+                    <div style="position:relative">
+                        <div class="hero-img-wrap">
+                            <img src="images/mairie-antsiranana.jpg"
+                                 alt="Mairie d'Antsiranana — CommuneService"
+                                 class="hero-img">
+                            <div class="hero-img-badge">
+                                <i class="bi bi-building-fill"></i>
+                                Mairie d'Antsiranana (Diego Suarez)
+                            </div>
+                        </div>
+                        <div class="hero-img-frame"></div>
+                    </div>
+                </div>
+
+            </div>
         </div>
+    </div>
+
+    <!-- Badge bas -->
+    <div class="hero-location">
+        <i class="bi bi-geo-alt-fill"></i>
+        Baie de Diego Suarez — Antsiranana, Madagascar
     </div>
 </section>
 
@@ -286,7 +297,7 @@
                 <div class="service-card">
                     <div class="service-icone si-bleu"><i class="bi bi-house-heart-fill"></i></div>
                     <h3 class="service-titre">Certificat de résidence</h3>
-                    <p class="service-texte">Attestation officielle de votre domicile actuel délivrée par la commune</p>
+                    <p class="service-texte">Attestation officielle de votre domicile actuel délivrée par la commune d'Antsiranana</p>
                 </div>
             </div>
             <div class="col-md-4 col-sm-6">
@@ -375,7 +386,7 @@
 <section class="section-cta">
     <div class="container">
         <h2 class="cta-titre">Prêt à simplifier vos démarches ?</h2>
-        <p class="cta-desc">Rejoignez les citoyens qui gèrent leurs demandes administratives en ligne, depuis chez eux.</p>
+        <p class="cta-desc">Rejoignez les citoyens d'Antsiranana qui gèrent leurs demandes administratives en ligne.</p>
         <div class="cta-btns">
             <a href="register.html" class="btn-hero-primary">
                 <i class="bi bi-person-plus-fill"></i>Créer un compte gratuit
@@ -395,7 +406,7 @@
                 <div class="footer-brand">
                     <i class="bi bi-building-fill me-2"></i>CommuneService — Portail Administratif
                 </div>
-                <p class="footer-desc">Service public numérique — République de Madagascar · 2026</p>
+                <p class="footer-desc">Service public numérique — Commune d'Antsiranana (Diego Suarez) · Madagascar · 2026</p>
             </div>
             <div class="col-md-6 text-md-end">
                 <a href="login.html" class="footer-link me-3">Connexion</a>
